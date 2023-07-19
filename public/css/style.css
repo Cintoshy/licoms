@@ -1,0 +1,90 @@
+/*This is for background image of the page*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+body{
+background-image: url('../img/CSPC.jpg');   
+  height: 100vh;
+   width:100%;
+   background-size: 100% 100%;  
+   background-repeat: no-repeat;
+   background-attachment: fixed;
+   overflow-x: hidden;
+}
+.my-custom-row{
+  overflow: hidden;
+}
+ #my-custom-col{
+  display: flex;
+  align-items: center;
+  height: 100vh;
+
+}
+#my-custom-col1{
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  height: 100vh;
+}
+ .title h1{
+   font-size: 60px;
+   color: rgb(255, 255, 255);
+   text-shadow: 2px 3px black;
+   font-family: 'Poppins';
+   font-weight: bold;
+   
+
+ }
+ .title h5{
+  color: rgb(220, 248, 12);
+  font-weight: bold;
+  letter-spacing: 7px;
+  -webkit-text-stroke: 1px  rgb(0, 0, 0);
+  opacity: 0;
+ }
+ .side-left{
+  animation: slideleft 1s linear forwards;
+ }
+ @keyframes slideleft{
+  0%{
+    transform: translate(70px);
+    opacity: 0;
+    color: rgb(44, 128, 255);
+
+  }
+  100%{
+    transform: translate(0px);
+    
+    opacity: 1;
+  }
+ }
+.btn{
+  font-weight: bold;
+  border-radius: 30px;
+
+ }
+
+
+/*login*/
+ 
+.landing{
+  background-color: white;
+  transition: all 0.6s;
+  width: 400px;
+  border-radius: 20px;
+  border-style: double;
+  animation: zoom-in-zoom-out 1.2s;
+
+}
+.landing:hover {
+  transform: scale(1.1);
+}
+@keyframes zoom-in-zoom-out {
+  0%{
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100%{
+    transform: scale(1,1);
+  }
+  
+}

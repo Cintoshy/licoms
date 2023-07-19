@@ -1,0 +1,52 @@
+@extends('layout.layout')
+
+@section('content')
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Faculty</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <a href="" class="btn btn-success btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus mt-1"></i>
+                        </span>
+                        <span class="text">Convert to Excel</span>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <select class="form-control" id="role" name="role">
+                        <option value="">All</option>
+                        <option value="0">Approved</option>    
+                        <option value="1">Pending</option>
+                        <option value="2">Rejected</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+            <table>
+    <tr>
+        <th>Book Title</th>
+        <th>Author</th>
+        <th>Faculty</th>
+        <th>Librarian</th>
+        <th>Program Chair</th>
+        <th>Status</th>
+    </tr>
+    @foreach($requestedBooks as $requestedBook)
+    <tr>
+        <td>{{ $requestedBook->book->title }}</td>
+        <td>{{ $requestedBook->book->author }}</td>
+        <td>{{ $requestedBook->faculty->first_name }}</td>
+        <td>{{ $requestedBook->librarian->first_name }}</td>
+        <td>{{ $requestedBook->programChair->first_name }}</td>
+        <td>{{ $requestedBook->status }}</td>
+    </tr>
+    @endforeach
+</table>
+
+            </div>
+        </div>
+    </div>
+@endsection

@@ -1,0 +1,42 @@
+:root {
+  --primary-color: #007bff; /* Define the primary color value */
+}
+#collection_wrapper .btn {
+    margin: 2px;
+    padding: 10px;
+    background-color: rgb(145, 71, 71);
+    color: white;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  #collection_wrapper .btn:hover {
+    background-color: #a09545;
+    color: whte;
+  }
+  
+  #collection_wrapper .buttons-print{
+    
+    background-color: rgb(94, 94, 94);
+  }
+  #collection_wrapper .buttons-csv{
+    
+    background-color: rgb(80, 136, 255);
+  }
+  #collection_wrapper .buttons-excel{
+    
+    background-color: var(--primary-color); 
+  }
+  #collection_wrapper .buttons-pdf{
+    
+    background-color: rgb(255, 0, 0);
+  }
+  #collection_wrapper .buttons-print{
+    
+    background-color: rgb(238, 255, 0);
+  }
