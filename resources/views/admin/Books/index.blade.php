@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8 mb-3">
-                    <button class="btn btn-icon-split" data-toggle="modal" data-target="#AddBooks">
+                    <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#AddBooks">
                         <span class="icon text-white-50">
                             <i class="fas fa-plus mt-1"></i>
                         </span>
