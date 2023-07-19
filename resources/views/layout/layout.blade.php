@@ -4,7 +4,6 @@
     <!-- Custom styles-->
         <!-- Custom fonts for this template-->
 
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="{{ asset('assets/css/sb-admin-2.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
 
@@ -12,7 +11,7 @@
         rel="stylesheet">
 
     <!-- Bootstsrap styles-->
-    <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" type="text/css">
 
     <!-- DataTables CSS -->
     <link href="{{ asset('assets/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
