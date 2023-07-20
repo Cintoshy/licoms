@@ -48,6 +48,7 @@
                                 <td>{{ $book->year }}</td>
                                 <td>{{ $book->cc }}</td>
                                 <td>
+                                <a class="btn btn-info btn-sm" href="{{ route('admin.books.show', $book->id) }}">View</a>
                                 <a class="btn btn-primary btn-sm" onclick="openEditBookModal('{{ route('admin.books.edit', $book) }}')">Edit</a>
                                     <form action="{{ route('admin.books.destroy', $book) }}" method="POST" style="display: inline-block;">
                                         @csrf

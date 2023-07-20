@@ -101,5 +101,12 @@ $(document).ready(function() {
   }
 });
 
+$(document).ready(function() {
+  // Button click event handlers
+  $('#details-btn').click(function() {
+    $('#details-form').show();
+    $('#status-form, #files-form, #messages-form, #lib-form, #actions-form, #classifications-form, #project-team-form, #cash-program-form, #reprogramming-status-form').hide();
+  });
+});
 
 

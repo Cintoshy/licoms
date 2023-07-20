@@ -34,6 +34,11 @@ class BookController extends Controller
         return view('admin.books.edit', compact('book'));
     }
 
+    public function show(Book $book)
+    {   
+        return view('admin.books.show', compact('book'));
+    }
+
     public function update(Request $request, Book $book)
     {
         // Validate the input data

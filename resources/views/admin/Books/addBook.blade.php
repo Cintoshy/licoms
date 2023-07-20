@@ -79,4 +79,18 @@
     </div>
 </div>
 
+<div class="col-md-12">
+    <div class="text-center">
+      <button class="btn btn-primary">Actions</button>
+      <button class="btn btn-primary">Details</button>
+      <button class="btn btn-primary">Line-Item Budget</button>
+      <button class="btn btn-primary">Classifications</button>
+      <button class="btn btn-primary">Files</button>
+      <button class="btn btn-primary">Messages</button>
+      <button class="btn btn-primary">Project Team</button>
+      <button class="btn btn-primary">Status</button>
+      <button class="btn btn-primary">Cash Program</button>
+      <button class="btn btn-primary">Reprogramming Status</button>
+    </div>
+
 @endsection
