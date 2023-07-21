@@ -17,14 +17,9 @@
                 </a>
                 <table class="table table-bordered table-sm text-right">
                     <tbody>
-                    <tr>
-                    <tr>
-                        <th scope="row" width="25%">ID</th>
-                        <td class="text-left">{{ $book->id }}</td>
-                        </tr>
                         <tr>
-                        <th scope="row" width="25%">BOOK TITLE</th>
-                        <td class="text-left">{{ $book->title }}</td>
+                        <th scope="row" class="align-middle" width="25%">BOOK TITLE</th>
+                        <td class="align-middle font-weight-bold text-light bg-gradient-primary text-left">{{ $book->title }}</td>
                         </tr>
                         <tr>
                         <th scope="row">AUTHOR</th>
@@ -71,7 +66,7 @@
                                  <div class="input-group">
                                     <input type="text" class="form-control form-control-user" id="title" name="title" value="http.doi/10/EthicalHacking">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">Visit</button>
+                                    <button class="btn btn-primary  px-3" type="button">Visit</button>
                                 </div>
                             </div>
                         </div>

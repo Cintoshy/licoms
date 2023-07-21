@@ -120,7 +120,7 @@
             <li class="nav-item active">
                 <a class="nav-link">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Program Chair</span></a>
+                    <span>Program Chair - {{ $user->assigned_program }}</span></a>
             </li>
 
             <!-- Divider -->
@@ -177,7 +177,7 @@
             <li class="nav-item active">
                 <a class="nav-link">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Librarian</span></a>
+                    <span>Librarian - {{ $user->assigned_program }}</span></a>
             </li>
 
             <!-- Divider -->
@@ -221,16 +221,17 @@
         @elseif($role ===3)
 
                 <!-- Faculty Sidebar -->
-
+                
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
+            @if (Auth::check())
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Faculty</span></a>
+                    <span>Faculty - {{ $user->assigned_program }}</span></a>
             </li>
+            @endif
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -262,11 +263,17 @@
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Course Code Guide</span></a>
-            </li>
+            <div class="dropdown px-3" >
+                <input type="text" style="font-size:12px;" class="form-control dropdown-toggle search-input" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="Search Course Code">
+                    <div class="dropdown-menu dropdown-options" aria-labelledby="dropdownMenuButton">
+                     @foreach ($courses as $course)
+                     <a class="dropdown-item" style="font-size:10px;">{{ $course->course_code }} - {{ $course->course_title }}</a>
+
+                     @endforeach
+                    </div>
+                </div>
             </div>
+            </li>
         <!--Faculty End of Sidebar -->
 
         @endif

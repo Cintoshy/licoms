@@ -48,7 +48,7 @@
                             <td>{{ $requestedBook->programChair ? $requestedBook->programChair->first_name : 'pending' }}</td>
                             <td>{{ $requestedBook->status }}</td>
                                 <td>
-                                <a href="" class="btn btn btn-primary btn-sm w-100">
+                                <a href="{{ route('lib-books.show', $book->id) }}" class="btn btn btn-primary btn-sm w-100">
                                     <span class="text">View
                                     <i class="fas fa-eye mt-1"></i>
                                     </span>

@@ -35,4 +35,6 @@ class RequestedBooks extends Model
     {
         return $this->belongsTo(User::class, 'pg_id'); // Update the foreign key column
     }
+
+
 }

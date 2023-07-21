@@ -25,11 +25,11 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-lg table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>CN</th>
-                            <th>Title</th>
+                            <th>Book Title</th>
                             <th>Author</th>
                             <th>Publish</th>    
                             <th>Accession #</th>
@@ -50,19 +50,18 @@
                                 <td>{{ $book->copy }}</td>
                                 <td>{{ $book->year }}</td>
                                 <td>
-                                    <div class="dropdown">
-                                    <input type="text" class="form-control dropdown-toggle search-input" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="Search">
+                                <div class="dropdown">
+                                    <input type="text" id="dropdownMenuButton" class="form-control dropdown-toggle search-input" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="Course Code">
                                     <div class="dropdown-menu dropdown-options" aria-labelledby="dropdownMenuButton">
-                                    <h6 class="dropdown-header">Course Code</h6>
-                                        <a class="dropdown-item">Option 1</a>
-                                        <a class="dropdown-item">Option 2</a>
-                                        <a class="dropdown-item">Option 3</a>
-                                        <!-- Add more options as needed -->
+                                    @foreach ($courses as $course)
+                                        <a class="dropdown-item">{{ $course->course_code }}</a>
+
+                                    @endforeach
                                     </div>
                                     </div>
                                 </td>
                                 <td>
-                                <a href="#" class="btn btn-primary btn-sm w-100">
+                                <a href="{{ route('fac-books.show', $book->id) }}" class="btn btn-primary btn-sm w-100">
                                         <span class="icon text-light">
                                             View
                                             <i class="fa-solid fa-eye ms-1"></i>
@@ -84,6 +83,19 @@
                             </tr>
                         @endforeach
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>CN</th>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Publish</th>    
+                            <th>Accession #</th>
+                            <th>Copy</th>
+                            <th>Year</th>
+                            <th>CC</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>

@@ -59,7 +59,7 @@
                             <td>{{ $requestedBook->programChair ? $requestedBook->programChair->first_name : '-' }}</td>
                             <td>{{ $requestedBook->status }}</td>   
                                 <td>
-                                    <a href="" class="btn btn-primary btn-sm w-100 my-3">
+                                    <a href="{{ route('pg-books.show', $book->id) }}" class="btn btn-primary btn-sm w-100 my-3">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-eye mt-1"></i>
                                         </span>

@@ -41,7 +41,12 @@ class GoogleController extends Controller
                 }
 
                 return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');
-            } 
+            
+        } else {
+            return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');
+            //return "Your email is not eligible for the website.";
+        }
+        
         } catch (\Throwable $th) {
             throw $th;
         }

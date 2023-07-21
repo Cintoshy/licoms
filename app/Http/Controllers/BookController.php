@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Book;
+use App\Models\Course;
 use App\Models\RequestedBooks;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -10,8 +11,13 @@ use Illuminate\Http\Response;
 
 class BookController extends Controller
 {
+    public function userSidebar()
+    {   
+        $user = User::all();
+        return view('layout.header', compact('user'));
+    }
     public function adminIndex()
-    {
+    {   
         $books = Book::all();
         return view('admin.Books.index', compact('books'));
     }
@@ -83,7 +89,8 @@ class BookController extends Controller
     public function facultyIndex()
     {
         $books = Book::all();
-        return view('faculty.index', compact('books'));
+        $courses = Course::all();
+        return view('faculty.index', compact('books', 'courses'));
     }
     public function allBooks()
     {
@@ -217,4 +224,37 @@ class BookController extends Controller
             // Return a response or redirect as needed
             return redirect()->back()->with('success', 'Book approved successfully');
      }
+
+    /* public function index()
+{
+    $user = Auth::user();
+    $programId = $user->assigned_program;
+
+    // Retrieve book requests only for the user's assigned program
+    $bookRequests = RequestedBooks::where(function ($query) use ($programId) {
+        $query->where('pg_id', $programId); // Program Chair requests // Faculty member requests for their own program
+    })->get();
+
+    return view('admin.Books.index1', compact('bookRequests'));
+}*/
+public function index()
+{
+    $user = Auth::user();
+    $programId = $user->assigned_program;
+
+    // Retrieve book requests where the faculty requester's assigned_program matches the user's assigned program
+    $bookRequests = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+        $query->where('assigned_program', $programId);
+    })->get();
+
+    return view('admin.Books.index1', compact('user', 'bookRequests'));
+}
+
+
+
+
+
+
+
+
 }

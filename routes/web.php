@@ -68,6 +68,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('admin.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('admin.pendingBooks');
     Route::get('/rejectedBooks', [BookController::class, 'rejectedBooks'])->name('admin.rejectedBooks');
+    Route::get('/requestBooks', [BookController::class, 'index'])->name('admin.request');
 
     // User type role
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
@@ -81,16 +82,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 // Program-Chair Routes
 Route::prefix('programChair')->middleware(['auth', 'programchair'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'pgIndex'])->name('program-chair.index');
+    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('pg-books.show');
     Route::put('/updateStatus/{id}', [BookController::class, 'approveBook'])->name('pg-books.grant-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'rejectBook'])->name('pg-books.deny-status');
     Route::put('/pg-books/{id}/change-status', [BookController::class, 'changeStatus'])->name('pg-books.change-status');
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('pg.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('pg.pendingBooks');
+    Route::get('/requestBookss', [BookController::class, 'index'])->name('fac.request');
 });
 
 // Library Routes
 Route::prefix('librarian')->middleware(['auth', 'librarian'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'librarianIndex'])->name('librarian.dashboard');
+    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('lib-books.show');
     Route::put('/updateStatus/{id}', [BookController::class, 'grantBook'])->name('lib-books.grant-status');
     Route::put('/denyStatus/{id}', [BookController::class, 'denyBook'])->name('lib-books.deny-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelGrant'])->name('lib-books.cancel-status');
@@ -101,6 +105,7 @@ Route::prefix('librarian')->middleware(['auth', 'librarian'])->group(function ()
 // Faculty Routes
 Route::prefix('faculty')->middleware(['auth', 'faculty'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'facultyIndex'])->name('faculty.dashboard');
+    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('fac-books.show');
     Route::put('/updateStatus/{id}', [BookController::class, 'selectBook'])->name('fac-books.update-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelBook'])->name('fac-books.cancel-status');
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('fac.approvedBooks');
