@@ -71,11 +71,21 @@
                 <i class="fas fa-th-list"></i>
                     <span>Collection Profile</span></a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.departments.index') }}">
+                <i class="fa-solid fa-file"></i>
+                    <span>Departments</span></a>
+            </li>
             <!-- Nav Item - Charts -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.program.index') }}">
                 <i class="fa-solid fa-file"></i>
                     <span>Programs</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.course.index') }}">
+                <i class="fa-solid fa-file"></i>
+                    <span>Courses</span></a>
             </li>
 
             <!-- Nav Item - Tables -->
@@ -197,7 +207,7 @@
             </li>
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="">
+                <a class="nav-link" href="{{ route('lib-Reports') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Reports</span></a>
             </li>
@@ -274,6 +284,8 @@
                 </div>
             </div>
             </li>
+
+
         <!--Faculty End of Sidebar -->
 
         @endif

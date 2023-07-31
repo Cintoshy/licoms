@@ -81,6 +81,67 @@ function openEditBookModal(editBookUrl) {
   });
 }
 
+function openLibEditBookModal(editBookUrl) {
+  // Perform any additional actions before opening the modal
+
+  // Make an AJAX request to fetch the edit user content
+  $.ajax({
+      url: editBookUrl,
+      method: 'GET',
+      success: function(response) {
+          // Update the modal body with the fetched content
+          $('#EditUser .modal-body').html(response);
+
+          // Open the modal
+          $('#EditUser').modal('show');
+      },
+      error: function() {
+          // Handle error if needed
+      }
+  });
+}
+
+
+function openDeptEditBookModal(editBookUrl) {
+  // Perform any additional actions before opening the modal
+
+  // Make an AJAX request to fetch the edit user content
+  $.ajax({
+      url: editBookUrl,
+      method: 'GET',
+      success: function(response) {
+          // Update the modal body with the fetched content
+          $('#EditDeparment .modal-body').html(response);
+
+          // Open the modal
+          $('#EditDeparment').modal('show');
+      },
+      error: function() {
+          // Handle error if needed
+      }
+  });
+}
+
+function openEditCourseModal(editBookUrl) {
+  // Perform any additional actions before opening the modal
+
+  // Make an AJAX request to fetch the edit user content
+  $.ajax({
+      url: editBookUrl,
+      method: 'GET',
+      success: function(response) {
+          // Update the modal body with the fetched content
+          $('#EditCourse .modal-body').html(response);
+
+          // Open the modal
+          $('#EditCourse').modal('show');
+      },
+      error: function() {
+          // Handle error if needed
+      }
+  });
+}
+
 $(document).ready(function() {
   var popup = $('#popup');
   if (popup.length > 0) {

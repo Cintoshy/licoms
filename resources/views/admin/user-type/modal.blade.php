@@ -92,3 +92,5 @@
                 <div class="modal-footer">
                     <h6 class="text-primary">LICOMS</h6>
                 </div>
+                
+

@@ -7,6 +7,8 @@ use App\Http\Controllers\SOR_Controller;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\CollectionProfileController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -22,8 +24,7 @@ Route::get('/', function () {
         } elseif ($user->role == '3') {
             return redirect()->route('faculty.dashboard');
         }
-    }
-    
+    }   
     // User is not logged in or role not found, show the landing view
     return view('landing');
 });
@@ -34,11 +35,11 @@ Route::get('auth/google',[GoogleController::class, 'loginWithGoogle'])->name('lo
 Route::any('auth/google/callback', [GoogleController::class, 'callbackFromGoogle'])->name('callback');
 Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('admin.books.show');
+});
 
 // Admin Panel Route//
-
-
-
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('home', function () {
         return view('admin.index');
@@ -49,18 +50,37 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Summary of Records
     Route::get('/summaryRecords', [SOR_Controller::class, 'index'])->name('admin.SOR.index');
 
-
     // CollectionProfile
     Route::get('/collectionProfile', [CollectionProfileController::class, 'index'])->name('admin.CollectionProfile.index');
 
     // Programs
     Route::get('/programs', [ProgramController::class, 'index'])->name('admin.program.index');
+    Route::get('/departments', [ProgramController::class, 'departmentIndex'])->name('admin.department.index');
+    Route::get('/department/create', [ProgramController::class, 'create'])->name('admin.addDepartment');
+    Route::post('/departmentAdded', [ProgramController::class, 'departmentStore'])->name('admin.department.store');
+    Route::post('/courseAdded', [ProgramController::class, 'courseStore'])->name('admin.course.store');
+
+    //Departements
+    Route::get('/departments', [DepartmentController::class, 'index'])->name('admin.departments.index');
+    Route::get('/department/create', [DepartmentController::class, 'create'])->name('admin.addDepartments');
+    Route::post('/departmentAddeds', [DepartmentController::class, 'departmentStoreIndex'])->name('admin.departments.store');
+    Route::get('/departments/{program}/edit', [DepartmentController::class, 'edit'])->name('admin.department.edit');
+    Route::put('/departments/{program}', [DepartmentController::class, 'update'])->name('admin.department.update');
+    Route::delete('/departments/{program}', [DepartmentController::class, 'destroy'])->name('admin.department.destroy');
+
+    // Courses //
+    Route::get('/courses', [CourseController::class, 'index'])->name('admin.course.index');
+    Route::post('/course-added', [CourseController::class, 'store'])->name('admin.courses.store');
+    Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('admin.course.edit');
+    Route::put('/courses/{course}', [CourseController::class, 'update'])->name('admin.course.update');
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('admin.course.destroy');
+
+
 
     // Books
     Route::get('/listBooks', [BookController::class, 'adminIndex'])->name('admin-books.index');
     Route::get('/books/create', [BookController::class, 'create'])->name('admin.books.create');
     Route::post('/books', [BookController::class, 'store'])->name('admin.books.store');
-    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('admin.books.show');
     Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('admin.books.edit');
     Route::put('/books/{book}', [BookController::class, 'update'])->name('admin.books.update');
     Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('admin.books.destroy');
@@ -94,7 +114,10 @@ Route::prefix('programChair')->middleware(['auth', 'programchair'])->group(funct
 // Library Routes
 Route::prefix('librarian')->middleware(['auth', 'librarian'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'librarianIndex'])->name('librarian.dashboard');
+    Route::get('/Reports', [CollectionProfileController::class, 'index'])->name('lib-Reports');
     Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('lib-books.show');
+    Route::get('/books/{book}/edit', [BookController::class, 'libEdit'])->name('lib-books.edit');
+    Route::put('/books/{book}', [BookController::class, 'libUpdate'])->name('lib-books.update');
     Route::put('/updateStatus/{id}', [BookController::class, 'grantBook'])->name('lib-books.grant-status');
     Route::put('/denyStatus/{id}', [BookController::class, 'denyBook'])->name('lib-books.deny-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelGrant'])->name('lib-books.cancel-status');
@@ -105,8 +128,8 @@ Route::prefix('librarian')->middleware(['auth', 'librarian'])->group(function ()
 // Faculty Routes
 Route::prefix('faculty')->middleware(['auth', 'faculty'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'facultyIndex'])->name('faculty.dashboard');
-    Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('fac-books.show');
-    Route::put('/updateStatus/{id}', [BookController::class, 'selectBook'])->name('fac-books.update-status');
+    Route::get('/showBooksss/{book}', [BookController::class, 'show'])->name('fac-books.show');
+    Route::post('/select-book/{id}', [BookController::class, 'selectBook'])->name('fac-select.book');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelBook'])->name('fac-books.cancel-status');
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('fac.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('fac.pendingBooks');

@@ -13,6 +13,7 @@ class RequestedBooks extends Model
         'fac_id',
         'lib_id',
         'pg_id',
+        'course_id',
         'status',
     ];
 
@@ -23,17 +24,21 @@ class RequestedBooks extends Model
 
     public function faculty(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'fac_id'); // Update the foreign key column
+        return $this->belongsTo(User::class, 'fac_id');
     }
 
     public function librarian(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'lib_id'); // Update the foreign key column
+        return $this->belongsTo(User::class, 'lib_id');
     }
 
     public function programChair(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pg_id'); // Update the foreign key column
+        return $this->belongsTo(User::class, 'pg_id');
+    }
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
 

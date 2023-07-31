@@ -1,11 +1,10 @@
 @extends('layout.layout')
 
 @section('content')
-
 <!-- Add User -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Add Program</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Add Department</h6>
     </div>
     <div class="card-body">
     <div class="row">
@@ -17,22 +16,7 @@
                     <span class="text">RETURN</span>
                 </a>
             </div>
-                <div class="col-md-3">
-                    
-                    <div class="d-flex justify-content-end">
-                    <button class="btn btn btn-primary btn-sm mx-1" data-toggle="modal" data-target="#CreateDepartment">
-                    <span class="text">Add Department
-                                <i class="fas fa-plus mt-1"></i>
-                            </span>
-                    </button>
-                    <button class="btn btn btn-primary btn-sm " data-toggle="modal" data-target="#CreateCourse">
-                         <span class="text">Add Course
-                                <i class="fas fa-plus mt-1"></i>
-                            </span>
-                    </a>
-                    </div>
-                </div>
-            </div>
+        </div>
 
 
         @if (isset($validation))
@@ -50,32 +34,37 @@
             <div class="form-group row">
                 <div class="col-sm-12 mb-6 mb-sm-0">
                     <input type="text" class="form-control form-control-user" id="id" name="id" value=""
-                        placeholder="Id Number" required>
+                        placeholder="Id Number">
                 </div>
             </div>
                 <div class="form-group row">
                 <div class="col-sm-6 mb-3 sm-0">
-                <select class="form-control form-control-user" id="department" name="department" required>
-                            <option value="" disabled selected>Department</option>
-                        @foreach ($program as $department)
-                             <option value="{{ $department->department }}">{{ $department->department }}</option>
-                         @endforeach
+                    <select class="form-control form-control-user" id="role" name="role">
+                        <option value="" selected disabled>Department</option>
+                        <option value="0">CAS</option>
+                        <option value="1">CCS</option>
+                        <option value="2">CEA</option>
+                        <option value="3">CHS</option>
+                        <option value="4">CTDE</option>
+                        <option value="5">CTHBM</option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3   ">
-                <select class="form-control form-control-user" id="program" name="program" required>
-                            <option value="" disabled selected>Program</option>
-                        @foreach ($program as $program)
-                             <option value="{{ $program->name }}">{{ $program->name }}</option>
-                         @endforeach
+                    <select class="form-control form-control-user" id="role" name="role">
+                        <option value="" selected disabled>Program</option>
+                        <option value="0">Program 1</option>
+                        <option value="1">Program 2</option>
+                        <option value="2">Program 3</option>
+                        <option value="3">Program 4</option>
                     </select>
                 </div>
                 <div class="col-sm-6 mb-3 sm-0">
-                <select class="form-control form-control-user" id="course" name="course" required>
-                            <option value="" disabled selected>Course</option>
-                        @foreach ($courses as $course)
-                             <option value="{{ $course->name }}">{{ $course->course_title }}</option>
-                         @endforeach
+                    <select class="form-control form-control-user" id="role" name="role">
+                        <option value="" selected disabled>Course</option>
+                        <option value="0">Mobile Tech</option>
+                        <option value="1">Ethical Hacking</option>
+                        <option value="2">Programming</option>
+                        <option value="3">Information Assurance</option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3   ">
@@ -89,11 +78,12 @@
                 </div>
                 
                 <div class="col-sm-6 mb-5 mb-sm-0">
-                    <input type="text" class="form-control form-control-user" id="crs_grp" name="crs_grp" value="" placeholder="Course Group" required>
+                    <input type="text" class="form-control form-control-user" id="crs_grp" name="crs_grp" value=""
+                        placeholder="Course Group" required>
                 </div>
                 <div class="col-sm-6 mb-5 mb-sm-0">
                     <select class="form-control form-control-user" id="role" name="role">
-                        <option value="" selected disabled>Semester</option>
+                        <option value="" selected disabled>Semeteser</option>
                         <option value="0">1st Semester</option>
                         <option value="1">2nd Semester</option>
                     </select>
@@ -110,13 +100,6 @@
                 <i class="fas fa-plus"></i> Add Program
             </button>
         </form>
-        
-    </div>
-   
-</div>
-@include('admin.Program.modal')
-
-        </div>
     </div>
 </div>
 

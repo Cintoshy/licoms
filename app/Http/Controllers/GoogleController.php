@@ -31,13 +31,13 @@ class GoogleController extends Controller
 
                 // Check user role and redirect accordingly
                 if ($is_user->role == '0') {
-                    return redirect()->route('home'); // Replace 'admin.dashboard' with the actual route name for the admin dashboard
+                    return redirect()->route('home');
                 } elseif ($is_user->role == '1') {
-                    return redirect()->route('program-chair.index'); // Replace 'program.page' with the actual route name for the program page
+                    return redirect()->route('program-chair.index'); 
                 } elseif ($is_user->role == '2') {
-                    return redirect()->route('librarian.dashboard'); // Replace 'librarian.dashboard' with the actual route name for the librarian dashboard
+                    return redirect()->route('librarian.dashboard'); 
                 } elseif ($is_user->role == '3') {
-                    return redirect()->route('faculty.dashboard'); // Replace 'faculty.dashboard' with the actual route name for the faculty dashboard
+                    return redirect()->route('faculty.dashboard'); 
                 }
 
                 return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');

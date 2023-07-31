@@ -16,6 +16,5 @@ class Book extends Model
         'copy',
         'year',
         'publish',
-        'cc',
     ];
 }

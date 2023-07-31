@@ -9,7 +9,7 @@
                 </h3>
               </div>
               <div class="card-body pad table-responsive">
-              <a href="{{ route('admin-books.index') }}" class="btn btn-warning btn-icon-split btn-sm mb-3">
+              <a href="{{ route('faculty.dashboard') }}" class="btn btn-warning btn-icon-split btn-sm mb-3">
                     <span class="icon text-white-50">
                         <i class="fas fa-arrow-left my-1"></i>
                     </span>

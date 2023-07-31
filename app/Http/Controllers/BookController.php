@@ -11,11 +11,6 @@ use Illuminate\Http\Response;
 
 class BookController extends Controller
 {
-    public function userSidebar()
-    {   
-        $user = User::all();
-        return view('layout.header', compact('user'));
-    }
     public function adminIndex()
     {   
         $books = Book::all();
@@ -30,19 +25,25 @@ class BookController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $input = $request->all();
-        $input['status'] = 'Available'; // Set the status to 'Available'
+       //  $input['status'] = 'Available'; //
         Book::create($input);
         return redirect('admin/listBooks')->with('success', 'Book Added!');
     }
 
     public function edit(Book $book)
-    {
+    {   
+
         return view('admin.books.edit', compact('book'));
     }
+    public function libEdit(Book $book)
+    {   
 
+        return view('librarian.edit', compact('book'));
+    }
     public function show(Book $book)
     {   
-        return view('admin.books.show', compact('book'));
+        $courses = Course::all();
+        return view('others.allUsers.show', compact('book', 'courses'));
     }
 
     public function update(Request $request, Book $book)
@@ -65,6 +66,26 @@ class BookController extends Controller
         return redirect()->route('admin-books.index')->with('success', 'Book updated successfully.');
     }
 
+    public function libUpdate(Request $request, Book $book)
+    {
+        // Validate the input data
+        $validatedData = $request->validate([
+            'id' => 'required',
+            'title' => 'required',
+            'author' => 'required',
+            'access_no' => 'required',
+            'copy' => 'required',
+            'year' => 'required',
+            'publish' => 'required',
+        ]);
+
+        // Update the book with the validated data
+        $book->update($validatedData);
+
+        // Redirect to the index page with a success message
+        return redirect()->route('librarian.dashboard')->with('success', 'Book updated successfully.');
+    }
+
     public function destroy(Book $book)
     {
         // Delete the book
@@ -82,16 +103,30 @@ class BookController extends Controller
 
     public function pgIndex()
     {
-        $requestedBooks = RequestedBooks::whereIn('status', ['Selected', 'granted'])->get();
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->whereIn('status', ['Selected', 'Granted'])->get();
+    
         return view('programChair.index', compact('requestedBooks'));
     }
 
     public function facultyIndex()
     {
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->get();
+
         $books = Book::all();
         $courses = Course::all();
-        return view('faculty.index', compact('books', 'courses'));
+        return view('faculty.index', compact('books', 'requestedBooks', 'courses'));
     }
+
     public function allBooks()
     {
         $books = Book::all();
@@ -99,29 +134,53 @@ class BookController extends Controller
     }
     
     public function pendingBooks()
-    {
-        $requestedBooks = RequestedBooks::whereIn('status', ['Selected', 'granted'])->get();
-        return view('others.allUsers.pending', compact('requestedBooks'));
+    {   
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->whereIn('status', ['Selected', 'Granted'])->get();
+
+        $courses = Course::all();
+        return view('others.allUsers.pending', compact('requestedBooks', 'courses'));
     }
+    
     public function librarianIndex()
-    {
-        $requestedBooks = RequestedBooks::where('status', 'Selected')->get();
-        return view('librarian.index', compact('requestedBooks'));
+    {   
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->where('status', 'Selected')->get();
+
+        $book = Book::all();
+
+        return view('librarian.index', compact('requestedBooks', 'book'));
     }
     public function approvedBooks()
     {
-        $requestedBooks = RequestedBooks::where('status', 'Approved')->get();
-        return view('others.allUsers.approvedBooks', compact('requestedBooks'));
-    }
-    public function pendingBooks1()
-    {
-        $books = Book::whereIn('status', ['Selected', 'Granted'])->get();
-        return view('others.allUsers.approvedBooks', compact('books'));
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->where('status', 'Approved')->get();
+    
+        $courses = Course::all();
+        return view('others.allUsers.approvedBooks', compact('requestedBooks', 'user', 'courses'));
     }
     public function rejectedBooks()
-    {
-        $books = Book::whereIn('status', ['Rejected', 'Denied'])->get();
-        return view('others.allUsers.approvedBooks', compact('books'));
+    {   
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->whereIn('status', ['Rejected', 'Denied'])->get();
+
+        return view('others.allUsers.approvedBooks', compact('requestedBooks'));
     }
 
 
@@ -182,19 +241,23 @@ class BookController extends Controller
         return redirect()->back();
     }
     
-
-    public function selectBook($id)
+    public function selectBook(Request $request, $id)
     {
-
-        // Create a new entry in the BookTracking table
+        $courseCode = $request->input('course_code');
+        $s = 1;
+    
+        // Create a new entry in the RequestedBooks table
         $requestedBook = new RequestedBooks();
         $requestedBook->book_id = $id;
+        $requestedBook->course_id = $courseCode; // Assuming your RequestedBooks model has a 'course_id' field to store the course code.
         $requestedBook->fac_id = Auth::id();
         $requestedBook->status = 'Selected';
         $requestedBook->save();
-
+    
         return redirect()->back()->with('success', 'Book has been selected successfully.');
     }
+    
+
 
     public function grantBook($id)
     {
@@ -237,24 +300,6 @@ class BookController extends Controller
 
     return view('admin.Books.index1', compact('bookRequests'));
 }*/
-public function index()
-{
-    $user = Auth::user();
-    $programId = $user->assigned_program;
-
-    // Retrieve book requests where the faculty requester's assigned_program matches the user's assigned program
-    $bookRequests = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
-        $query->where('assigned_program', $programId);
-    })->get();
-
-    return view('admin.Books.index1', compact('user', 'bookRequests'));
-}
-
-
-
-
-
-
 
 
 }

@@ -16,7 +16,6 @@ class CreateBooksTable extends Migration
             $table->integer('copy');
             $table->integer('year');
             $table->string('publish');
-            $table->string('cc');
             $table->timestamps();
         });
     }

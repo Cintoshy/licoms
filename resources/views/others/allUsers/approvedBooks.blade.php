@@ -21,7 +21,7 @@
                     <thead>
                         <tr>
                             <th>Book Title</th>
-                            <th>Author</th>
+                            <th>Course Code</th>
                             <th>Faculty</th>
                             <th>Librarian</th>
                             <th>Program Chair</th>
@@ -32,11 +32,29 @@
                     @foreach($requestedBooks as $requestedBook)
                         <tr>
                             <td>{{ $requestedBook->book->title }}</td>
-                            <td>{{ $requestedBook->book->author }}</td>
-                            <td>{{ $requestedBook->faculty ? $requestedBook->faculty->first_name : 'auto-approved' }}</td>
-                            <td>{{ $requestedBook->librarian ? $requestedBook->librarian->first_name : 'auto-approved' }}</td>
-                            <td>{{ $requestedBook->programChair ? $requestedBook->programChair->first_name : '-' }}</td>
-                            <td>{{ $requestedBook->status }}</td>
+                            <td>{{ $requestedBook->course_id }}</td>
+                            <td>
+                                @if ($requestedBook->faculty)
+                                    {{ $requestedBook->faculty->first_name }} {{ $requestedBook->faculty->last_name }}
+                                @else
+                                    auto-approved
+                                @endif
+                            </td>
+                            <td>
+                                @if ($requestedBook->librarian)
+                                    {{ $requestedBook->librarian->first_name }} {{ $requestedBook->librarian->last_name }}
+                                @else
+                                    auto-approved
+                                @endif
+                            </td>
+                            <td>
+                                @if ($requestedBook->programChair)
+                                    {{ $requestedBook->programChair->first_name }} {{ $requestedBook->programChair->last_name }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="fw-bold bg-success">{{ $requestedBook->status }}</td>
                             </tr>
                         @endforeach
                     </tbody>

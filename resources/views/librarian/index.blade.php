@@ -1,6 +1,9 @@
 @extends('layout.layout')
 
 @section('content')
+
+@include('flash_message')
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Book Request </h6>
@@ -28,7 +31,7 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
                     <thead>
-                        <tr>
+                        <tr><th>Book ID</th>
                             <th>Book Title</th>
                             <th>Author</th>
                             <th>Faculty</th>
@@ -41,26 +44,27 @@
                     <tbody>
                     @foreach($requestedBooks as $requestedBook)
                         <tr>
+                            <td>{{ $requestedBook->book->id }}</td>
                             <td>{{ $requestedBook->book->title }}</td>
                             <td>{{ $requestedBook->book->author }}</td>
                             <td>{{ $requestedBook->faculty ? $requestedBook->faculty->first_name : '-' }}</td>
                             <td>{{ $requestedBook->librarian ? $requestedBook->librarian->first_name : 'pending' }}</td>
                             <td>{{ $requestedBook->programChair ? $requestedBook->programChair->first_name : 'pending' }}</td>
                             <td>{{ $requestedBook->status }}</td>
-                                <td>
-                                <a href="{{ route('lib-books.show', $book->id) }}" class="btn btn btn-primary btn-sm w-100">
+                            <td width="10%">
+                                <button href="{{ route('lib-books.show', $requestedBook->id) }}" class="btn btn btn-primary btn-sm w-100">
                                     <span class="text">View
                                     <i class="fas fa-eye mt-1"></i>
                                     </span>
-                                </a>
-                                <a href="" class="btn btn btn-warning btn-sm w-100 my-3">
-                                    <span class="icon text-white-50">
-                                        <i class="fas fa-pencil mt-1"></i>
+                                </button>
+                                <button class="btn btn btn-warning btn-sm w-100 my-1" onclick="openLibEditBookModal('{{ route('lib-books.edit', $requestedBook->book->id) }}')">
+                                <span class="text">Edit</span>  
+                                    <span class="icon text-white-100">
+                                        <i class="fas fa-pencil ms-1"></i>
                                     </span>
-                                    <span class="text">Edit</span>
-                                </a>
+                                </button>
 
-                                    <form method="POST" action="{{ route('lib-books.grant-status', $requestedBook->book->id) }}">
+                                    <form method="POST" class="mb-1" action="{{ route('lib-books.grant-status', $requestedBook->book->id) }}">
                                         @csrf
                                         @method('PUT')
                                         <button type="submit" class="btn btn-success btn-sm w-100">
@@ -70,7 +74,7 @@
                                             </span>
                                         </button>
                                     </form>
-                                    <form method="POST" action="{{ route('lib-books.deny-status', $requestedBook->book->id) }}">
+                                    <form method="POST" class="m-0" action="{{ route('lib-books.deny-status', $requestedBook->book->id) }}">
                                         @csrf
                                         @method('PUT')
                                         <button type="submit" class="btn btn-danger btn-sm w-100">
@@ -79,8 +83,7 @@
                                                 <i class="fa-solid fa-ban ms-1"></i>
                                             </span>
                                         </button>
-
-
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
@@ -89,4 +92,5 @@
             </div>
         </div>
     </div>
+    @include('admin.Books.modal')
 @endsection

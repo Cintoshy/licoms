@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('fac_id')->nullable();
             $table->unsignedBigInteger('lib_id')->nullable();
             $table->unsignedBigInteger('pg_id')->nullable();
+            $table->string('course_id');
 
             $table->string('status');
             $table->timestamps();
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->foreign('fac_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('lib_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('pg_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('course_id')->references('course_code')->on('courses')->onDelete('cascade');
 
 
         });

@@ -25,6 +25,12 @@ background-image: url('../img/CSPC.jpg');
   align-items: center;
   height: 100vh;
 }
+#my-custom-error{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
  .title h1{
    font-size: 60px;
    color: rgb(255, 255, 255);
@@ -74,6 +80,28 @@ background-image: url('../img/CSPC.jpg');
   border-style: double;
   animation: zoom-in-zoom-out 1.2s;
 
+}
+.error-message{
+  background-color: white;
+  transition: all 0.6s;
+  width: 500px;
+  border-radius: 10% / 50%;
+  border-style: double;
+  animation: zoom-in-zoom-out 1.2s;
+
+}
+.error-message:hover {
+  transform: scale(1.1);
+}
+@keyframes zoom-in-zoom-out {
+  0%{
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100%{
+    transform: scale(1,1);
+  }
+  
 }
 .landing:hover {
   transform: scale(1.1);
