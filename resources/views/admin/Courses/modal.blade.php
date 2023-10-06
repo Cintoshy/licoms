@@ -48,10 +48,34 @@
                                 <input type="text" class="form-control form-control-user" id="course_title" name="course_title" value=""
                                     placeholder="Course Name" required>
                             </div>
+                            <div class="col-sm-12 mb-3 sm-0">
+                                <select class="form-control form-control-user" id="course_group" name="course_group" required>
+                                    <option value="" disabled selected>Course Group</option>
+                                    @foreach ($courseGroups as $courseGroup)
+                                        <option value="{{ $courseGroup->course_group }}">{{ $courseGroup->course_group }}</option>
+                                    @endforeach
+                                </select>
 
-                            <div class="col-sm-12 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="course_level" name="course_level" value=""
-                                    placeholder="Course Level" required>
+                            </div>
+                            
+
+                            <div class="col-sm-12 mb-3 sm-0">
+                            <select class="form-control form-control-user" id="course_level" name="course_level" required>
+                                    <option value="" disabled selected>Course Level</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-12 sm-0">
+                                <select class="form-control form-control-user" id="assigned_program" name="assigned_program" required>
+                                    <option value="" disabled selected>Program</option>
+                                    @foreach ($programs as $program)
+                                        <option value="{{ $program->name }}">{{ $program->name }}</option>
+                                    @endforeach
+                                </select>
+
                             </div>
                             </div>
                         <button class="btn btn-primary btn-block">

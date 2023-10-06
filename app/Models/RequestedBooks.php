@@ -15,8 +15,18 @@ class RequestedBooks extends Model
         'pg_id',
         'course_id',
         'status',
+        'program_id',
+        'verified_at',
     ];
+    protected $casts = [
+        'approved_at' => 'datetime:Y-m-d h:i A', 
+        'updated_at' => 'datetime:Y-m-d h:i A', 
+    ];
+    
+    
+    public $timestamps = true;
 
+    
     public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class, 'book_id');
@@ -38,7 +48,11 @@ class RequestedBooks extends Model
     }
     public function course(): BelongsTo
     {
-        return $this->belongsTo(Course::class, 'course_id');
+        return $this->belongsTo(Course::class, 'course_id', 'course_code')->select(['course_code', 'course_title', 'course_group', 'course_level']);
+    }
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(Program::class, 'program_name', 'name')->select(['name', 'department']);
     }
 
 

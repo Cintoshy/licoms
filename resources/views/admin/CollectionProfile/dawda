@@ -1,0 +1,156 @@
+@extends('layout.layout')
+
+@section('content')
+<div class="card shadow mb-4">
+    <div class="card-header mb-3">
+            <div class="row d-flex align-items-center my-3">    
+                <div class="col-sm-6 d-flex">
+                    <h1 class="display-6 fw-bolder text-uppercase">Collection Profile</h1>
+                </div>
+                <div class="col-sm-6">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#reportOptionsModal">
+                    Generate Report
+                </button>
+                    <!-- <a href="{{ route('export.collection-profile') }}" class="d-none d-sm-inline-block btn btn-success shadow-sm">
+                    <i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
+                        <div class="btn-group" role="group" aria-label="Button Group">
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#Modal2">
+                                <span class="text">Active Collection
+                                </span>
+                            </button>
+                            <button class="btn btn-danger" data-toggle="modal" data-target="#MinimumRequirements">
+                                <span class="text">Min. Requirements
+                                </span>
+                            </button>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#CompliedPercentage">
+                                <span class="text">Complied Percentage
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="container-fluid">
+
+
+            <div class="table-responsive">
+                <table class="table table-bordered text-center table-striped" width="100%" cellspacing="0">
+                <thead class="bg-gradient-info text-light">
+                    <tr>
+                    <th colspan="2" rowspan="2">{{$books->first()->course->assigned_program ?? $ProgramCode}}</th>
+                    <th colspan="2"></th>
+                    <th colspan="10">WITHIN PRESCRIBED 5 YEARS COPYRIGHT</th>
+                    <th rowspan="2" colspan="2">Grand Total</th>
+                    <th rowspan="3">% Per Subject</th>
+                    <th rowspan="3" width="10%">Titles Needed (2023)</th>
+                    <th rowspan="3" width="10%">Titles Needed (2024)</th>
+                    <th rowspan="2" colspan="2">{{$fiveYearsAgo->year}} Below</th>
+                    </tr>
+                   <tr>
+            
+
+            @foreach (array_reverse($years) as $year)
+                <th colspan="2">{{ $year }}</th>
+            @endforeach
+
+        </tr>
+        <tr>
+            <th>Code</th>
+            <th>Courses</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+        </tr>
+</thead>
+
+@php $previousCourseGroup = null; @endphp
+@foreach ($groupedBooks as $groupedData => $yearsData)
+            @php
+                
+                $courseTotalVolumes = 0;
+                $courseTotalTitles = 0;
+                $courseTotalVolumesBelow = 0;
+                $courseTotalTitlesBelow = 0;
+                $counterBelow = 0;
+                $totalAllCourseTitles = 0;
+                $courseGroup = $course->course_group;
+            @endphp
+<!-- 
+            <tr class="table-danger"> -->
+            @if ($previousCourseGroup !== $courseGroup)
+                <tr>
+                    <td>{{$courseGroup}}</td>
+                </tr>
+                @endif
+                <td>{{ $course->course_code }}</td>
+                <td>{{ $course->course_title}}</td>
+                @php $previousCourseGroup = $courseGroup; @endphp
+                @foreach (array_reverse($years) as $year)
+                    @php
+                        $yearData = $yearsData->get($year, [0 => ['total_volumes' => 0, 'total_titles' => 0]])[0];
+                        $courseTotalVolumes += $yearData['total_volumes'];
+                        $courseTotalTitles += $yearData['total_titles'];
+                    @endphp
+                    <td>{{ $yearData['total_titles'] }}</td>
+                    <td>{{ $yearData['total_volumes'] }}</td>
+                @endforeach
+                <td width="7%">{{ $courseTotalTitles }}</td>
+                <td width="7%">{{ $courseTotalVolumes }}</td>
+                @php
+                $result = ($courseTotalTitles >= 5) ? 100 : ($courseTotalTitles * 20);
+                @endphp
+                <td>{{$result}}%</td>
+                <td width="7%">
+                    @if ($courseTotalTitles >= 5)
+                        0
+                    @else   
+                        {{ 5 - $courseTotalTitles }}
+                    @endif
+                </td>
+                <td>0</td>
+                @php
+                    $totalTitlesBelow = 0;
+                    $totalVolumesBelow = 0;
+                @endphp
+            @foreach (array_reverse($fiveYearsBelow) as $year)
+                @php
+                    $yearData = $yearsData->get($year, [0 => ['total_volumes' => 0, 'total_titles' => 0]])[0];
+                    $totalTitlesBelow += $yearData['total_titles'];
+                    $totalVolumesBelow += $yearData['total_volumes'];
+                @endphp
+            @endforeach
+                <td>{{ $totalTitlesBelow }}</td>
+                <td>{{ $totalVolumesBelow }}</td>
+            
+                @php
+        $totalAllCourseTitles += $courseTotalTitles;
+        $counterBelow++;
+    @endphp
+        @endforeach
+
+
+    </table>
+    </div>
+</div>      
+            @include('admin.CollectionProfile.minimumRequirements')
+            @include('admin.CollectionProfile.averageModal')
+            @include('admin.CollectionProfile.reportModal')
+
+
+
+
+
+@endsection

@@ -1,62 +1,58 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Program;
 use App\Models\Course;
+use App\Models\Department;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    public function index(Program $program)
+    public function index(Department $department)
     {   
         $courses = Course::all();
-        $program = Program::all();
+        $department = Department::all();
 
-        return view('admin.Departments.index', compact('program', 'courses'));
+        return view('admin.Departments.index', compact('department', 'courses'));
     }
 
-    public function departmentStoreIndex(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {   
 
         $input = $request->all();
-        Program::create($input);
-        return redirect('admin/departments')->with('flash_message', 'Department Addedd!');
+        Department::create($input);
+        return redirect('admin/departments')->with('success', 'Department Addedd!');
     }
 
-    public function edit(Program $program)
+    public function edit(Department $department)
     {
-        return view('admin.Departments.edit', compact('program'));
+        return view('admin.Departments.edit', compact('department'));
     }
     
 
-    public function update(Request $request, Program $program)
+    public function update(Request $request, Department $department)
     {
         // Validate the input data
         $validatedData = $request->validate([
-            'code' => 'required',
-            'department' => 'required',
-            'name' => 'required',
+            'department_name' => 'required',
             'description' => 'required',
         ]);
     
         // Update the user with the validated data
-        $program->update([
-            'code' => $validatedData['code'],
-            'department' => $validatedData['department'],
-            'name' => $validatedData['name'],
+        $department->update([
+            'department_name' => $validatedData['department_name'],
             'description' => $validatedData['description'],
         ]);
     
         // Redirect to the index page with a success message
-        return redirect()->route('admin.departments.index')->with('success', 'Department updated successfully.');
+        return redirect()->route('admin.department.index')->with('success', 'Department updated successfully.');
     }
     
 
-    public function destroy(Program $program)
+    public function destroy(Department $department)
     {
-        $program->delete();
-        return redirect()->route('admin.departments.index')->with('success', 'User deleted successfully.');
+        $department->delete();
+        return redirect()->route('admin.department.index')->with('delete', 'Department deleted successfully.');
     }
 }

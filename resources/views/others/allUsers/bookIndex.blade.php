@@ -33,7 +33,7 @@
                             <th>Author</th>
                             <th>Publish</th>
                             <th>Accession #</th>
-                            <th>Copy</th>
+                            <th>Volume</th>
                             <th>Year</th>
                             <th>CC</th>
                             <th>Status</th>
@@ -47,7 +47,7 @@
                                 <td>{{ $book->title }}</td>
                                 <td>{{ $book->author }}</td>
                                 <td>{{ $book->access_no }}</td>
-                                <td>{{ $book->copy }}</td>
+                                <td>{{ $book->volume }}</td>
                                 <td>{{ $book->year }}</td>
                                 <td>{{ $book->publish }}</td>
                                 <td>{{ $book->cc }}</td>

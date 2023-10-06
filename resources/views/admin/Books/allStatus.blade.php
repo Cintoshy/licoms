@@ -20,6 +20,7 @@
                 <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>CN</th>
                             <th>Title</th>
                             <th>Author</th>
@@ -29,6 +30,7 @@
                             <th>Year</th>
                             <th>CC</th>
                             <th>Status</th>
+                            <th>Program</th>
                             <th>Program Chair</th>
                         </tr>
                     </thead>
@@ -36,15 +38,17 @@
                         @foreach($requestedBooks as $requestedBook)
                             <tr>
                                 <td>{{ $requestedBook->book->id }}</td>
+                                <td>{{ $requestedBook->book->call_number }}</td>
                                 <td>{{ $requestedBook->book->title }}</td>
                                 <td>{{ $requestedBook->book->author }}</td>
                                 <td>{{ $requestedBook->book->access_no }}</td>
                                 <td>{{ $requestedBook->book->copy }}</td>
                                 <td>{{ $requestedBook->book->year }}</td>
                                 <td>{{ $requestedBook->book->publish }}</td>
-                                <td>{{ $requestedBook->book->cc }}</td>
+                                <td>{{ $requestedBook->course_id }}</td>
                                 <td>{{ $requestedBook->status }}</td>
-                                <td>{{ $requestedBook->programChair->first_name }}</td>
+                                <th>{{ $requestedBook->program_name}}</th>
+                                <td>{{ $requestedBook->programChair->first_name ?? 'N/A' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

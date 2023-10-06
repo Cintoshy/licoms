@@ -1,13 +1,15 @@
 <html>
   <head>
-  	<title>Licoms</title>
+  	<title>LICOMS</title>
+
+    
     <!-- Custom styles-->
         <!-- Custom fonts for this template-->
 
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
 
-    <link  href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <!-- <link  href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet"> -->
 
     <!-- Bootstsrap styles-->
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" type="text/css">
@@ -15,6 +17,8 @@
     <!-- DataTables CSS -->
     <link href="{{ asset('assets/vendor/datatables/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/datatables/custom.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('img/icon.png') }}">
+    
   </head>
   <body>
 
@@ -24,9 +28,14 @@
  
   	@include('layout.footer')
 
+    
 
 
     <!-- Page level custom scripts -->
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
 
     
     <!-- Bootstrap core JavaScript-->
@@ -47,7 +56,8 @@
     <script src="{{ asset('assets/vendor/datatables/pdfmake.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/vfs_fonts.js') }}"></script>
     <script src="{{ asset('assets/js/demo/datatables-demo.js') }}"></script>
+    <script src="{{ asset('assets/js/demo/confirmationModal.js') }}"></script>
 
- 
+
   </body>
 </html>

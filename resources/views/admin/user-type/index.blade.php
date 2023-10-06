@@ -1,23 +1,31 @@
 @extends('layout.layout')
 
 @section('content')
+
+@include('flash_message')
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">User List</h6>
+    <div class="card-header">
+        <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                <h1 class="display-6 fw-bolder text-uppercase">Users</h1>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Total User</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $employees->count() }}</div>
+
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-solid fa-user-gear fa-4x text-gray-500 pr-3"></i>
+                </div>
+            </div>
         </div>
         <div class="card-body">
-            <a class="btn btn-primary btn-icon-split mb-3" data-toggle="modal" data-target="#CreateUser">
-                <span class="icon text-white-50">
-                    <i class="fas fa-plus mt-1"></i>
-                </span>
-                <span class="text">Add User-type</span>
-            </a>
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>User No</th>
+                            <th>#</th>
+                            <th>Employee ID</th>
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Contact</th>
@@ -28,33 +36,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($users as $user)
+                        @foreach($employees as $employee)
                             <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->first_name }}</td>
-                                <td>{{ $user->last_name }}</td>
-                                <td>{{ $user->contact }}</td>
-                                <td>{{ $user->email }}</td>
+                                <td>{{ $employee->id }}</td>
+                                <td>{{ $employee->user_id }}</td>
+                                <td>{{ $employee->first_name }}</td>
+                                <td>{{ $employee->last_name }}</td>
+                                <td>{{ $employee->contact }}</td>
+                                <td>{{ $employee->email }}</td>
                                 <td>
-                                    @if ($user->role === 0)
+                                    @if ($employee->role === 0)
                                         Admin
-                                    @elseif ($user->role === 2)
+                                    @elseif ($employee->role === 2)
                                         Librarian
-                                    @elseif ($user->role === 1)
+                                    @elseif ($employee->role === 1)
                                         Program chair
-                                    @elseif ($user->role === 3)
+                                    @elseif ($employee->role === 3)
                                         Faculty
                                     @else
                                         Unknown role
                                     @endif
-                                <td>{{ $user->assigned_program }}</td>
+                                <td>{{ $employee->assigned_program ?? 'None' }}</td>
                                 </td>
                                 <td>
-                                <a class="btn btn-primary btn-sm" onclick="openEditUserModal('{{ route('admin.users.edit', $user) }}')">Edit</a>
-                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" style="display: inline-block;">
+                                <button class="btn btn-primary btn" onclick="openEditUserModal('{{ route('admin.users.edit', $employee) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <form action="{{ route('admin.users.destroy', $employee) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <button type="submit" class="btn btn-danger btn"><i class="fas fa-trash text-white"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -64,5 +73,16 @@
             </div>
         </div>
     </div>
-    @include('admin.user-type.modal')
+</div>
+    <div class="bottom-right-container">
+            <button class="bg-primary bottom-right-button" data-toggle="modal" data-target="#CreateUser">
+
+                    <i class="fa-solid fa-user-plus text-white"></i>
+
+            </button>
+        </div>
+        @include('admin.user-type.modal')
+        </div>
+    </div>
+</div>
 @endsection

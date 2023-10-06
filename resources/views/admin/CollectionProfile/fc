@@ -1,0 +1,51 @@
+@extends('layout.layout')
+
+@section('content')
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">All list of Books Process Status</h6>
+        </div>
+        <div class="card-body">
+
+
+            @php    
+                $previousCourseGroup = null;
+            @endphp
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Courses</th>
+                        <!-- Add more table headers for additional book details -->
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($groupedBooks as $courseId => $courseGroup)
+
+                        @if ($courseGroup[0]->course->course_group !== $previousCourseGroup)
+                            <tr>
+                                <td colspan="{{ count($courseGroup[0]->getAttributes()) + 2 }}">
+                                    {{ $courseGroup[0]->course->course_group }}
+                                </td>
+                            </tr>
+                            @php
+                                $previousCourseGroup = $courseGroup[0]->course->course_group;
+                            @endphp
+                        @endif
+                        @foreach ($courseGroup as $book)
+                            <tr>
+                                <td>{{ $courseId }}</td>
+                                <td>{{ $book->program_name }}</td>
+                               
+                            </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+
+
+
+</div>
+</div>
+@endsection

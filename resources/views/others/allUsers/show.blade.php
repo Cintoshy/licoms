@@ -2,11 +2,12 @@
 
 
 @section('content')
-<div class="col-md-12">
+<div class="container mt-5">
+<div class="row">
+    <div class="col-md-12" id="details">
             <div class="card card-primary card-outline">
-              <div class="card-header">
-                  BOOK DETAILS
-                </h3>
+              <div class="card-header bg-gradient-light">
+                <h2 class="fw-bolder">BOOK DETAILS</h2>
               </div>
               <div class="card-body pad table-responsive">
               <!-- <a href="{{ route('admin-books.index') }}" class="btn btn-warning btn-icon-split btn-sm mb-3">
@@ -16,47 +17,60 @@
                     <span class="text">RETURN</span>
                 </a>
 -->
-                <table class="table table-bordered table-sm text-right">
+                <table class="table table-bordered table-lg text-right mt-3">
                     <tbody>
                         <tr>
-                        <th scope="row" class="align-middle" width="25%">BOOK TITLE</th>
+                        <th scope="row" class="align-middle" width="25%">Call Number :</th>
+                        <td class="align-middle fw-bolder text-danger text-left">{{ $book->call_number }}</td>
+                        </tr>
+                        <tr>
+                        <th scope="row" class="align-middle" width="25%">BOOK TITLE :</th>
                         <td class="align-middle font-weight-bold text-light bg-gradient-primary text-left">{{ $book->title }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">AUTHOR</th>
+                        <th scope="row">AUTHOR :</th>
                         <td class="text-left">{{ $book->author }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">STATUS</th>
+                        <th scope="row">STATUS :</th>
                         <td class="text-left">{{ $book->title }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">PUBLISH</th>
+                        <th scope="row">PUBLISH :</th>
                         <td class="text-left">{{ $book->publish }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">DATE SUBMITTED</th>
-                        <td class="text-left"></td>
+                        <th scope="row">YEAR :</th>
+                        <td class="text-left">{{ $book->year }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">LAST UPDATE</th>
-                        <td class="text-left"></td>
+                        <th scope="row">VOLUME/s :</th>
+                        <td class="text-left"> {{ $book->volume }}</td>
+                        </tr>
+                        <tr>
+                        <tr>
+                        <th scope="row">ACCESSION NUMBER :</th>
+                        <td class="text-left"> {{ implode(', ', json_decode($book->access_no)) }}</td>
+                        </tr>
+                        <th scope="row">DATE :</th>
+                        <td class="text-left">{{ $book->created_at }}</td>
                         </tr>
 
                     </tbody>
                 </table>
 
-                    <div class="mt-3 text-end">
+                    <!-- <div class="mt-3 text-end">
                         <button id="details-btn" class="btn btn-success">DOI</button>
                         <button class="btn btn-primary">Abstarct</button>
-                    </div>
+                    </div> -->
               </div>
             </div>
+          </div>
           </div>
 
 
 
-        <form id="details-form" class="mt-4" style="display: none;">
+        <!-- <form id="details-form" class="mt-4" style="display: none;">
             <div class="col-md-12">
                 <div class="card card-primary card-outline">
                     <div class="card-header">DETAILS</div>
@@ -75,6 +89,6 @@
                 </div>
                 </div>
             </div>
-        </form>
-
+        </form> -->
+    </div>
           @endsection

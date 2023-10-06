@@ -12,8 +12,8 @@ class UserController extends Controller
 {
     public function index()
     {   $allPrograms = Program::all();
-        $users = User::all();
-        return view('admin.user-type.index', compact('users', 'allPrograms'));
+        $employees = User::all();
+        return view('admin.user-type.index', compact('employees', 'allPrograms'));
     }
     /*
     public function create()
@@ -25,19 +25,22 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {   
-
+        $email = $request->input('email') . '@cspc.edu.ph';
         $input = $request->all();
+        $input['email'] = $email;
         User::create($input);
-        return redirect('admin/users')->with('flash_message', 'User Addedd!');
+        return redirect('admin/users')->with('success', 'User Addedd!');
     }
 
 
-    public function edit(User $user)
+    public function edit(User $employee) // Accept the ID directly
     {
+
         $allPrograms = Program::all(); // Retrieve all programs from the database
-    
-        return view('admin.user-type.edit', compact('user', 'allPrograms'));
+        
+        return view('admin.user-type.edit', compact('employee', 'allPrograms'));
     }
+    
     
 
     public function update(Request $request, User $user)
@@ -49,7 +52,7 @@ class UserController extends Controller
             'contact' => 'required',
             'email' => 'required|email',
             'role' => 'required',
-            'assigned_program' => 'required',
+            'assigned_program' => 'nullable',
         ]);
     
         // Update the user with the validated data
@@ -73,6 +76,6 @@ class UserController extends Controller
         $user->delete();
 
         // Redirect to the index page with a success message
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('delete', 'User deleted successfully.');
     }
 }

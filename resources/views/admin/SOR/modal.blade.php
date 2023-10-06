@@ -36,9 +36,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                <button class="btn btn-dark btn-block mt-3">Bachelor of Library and Information Science</button>
+                <button value=""class="btn btn-dark btn-block mt-3">Bachelor of Library and Information Science</button>
                 <button class="btn btn-dark btn-block mt-3">Bachelor of Science in Computer Science</button>
-                <button class="btn btn-dark btn-block mt-3">Bachelor of Science in Information Technology</button>
+                <a href="{{ route('admin.SOR.summaryRecords')}}" class="btn btn-dark btn-block mt-3">Bachelor of Science in Information Technology</a>
                 <button class="btn btn-dark btn-block mt-3">Bachelor of Science in Information Systems</button>    
                 </div>
                 <div class="modal-footer">

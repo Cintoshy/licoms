@@ -4,44 +4,48 @@
 
 @include('flash_message')
 
-<div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Department List</h6>
+    <div class="card shadow mb-4">
+        <div class="card-header">
+        <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                <h1 class="display-6 fw-bolder text-uppercase">Departments</h1>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Total Department</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $department->count() }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-solid fa-house-flag fa-4x text-gray-500 pr-3"></i>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-        <button class="btn btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#CreateDepartment">
-                    <span class="text">Add New
-                                <i class="fas fa-plus mt-1"></i>
-                            </span>
-                    </button>
 
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                        <th>Department Id</th>
-                            <th>Department Code</th>
+                            <th>#</th>
                             <th>Department Name</th>
-                            <th>Program</th>
                             <th>Description</th>
-                            <th>Action</th>
+                            <th width="10%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($program as $program)
+                        @foreach($department as $department)
                             <tr>
-                            <td>{{ $program->id }}</td>
-                                <td>{{ $program->code }}</td>
-                                <td>{{ $program->department }}</td>
-                                <td>{{ $program->name }}</td>
-                                <td>{{ $program->description }}</td>
+                            <td>{{ $department->id }}</td>
+                                <td>{{ $department->department_name }}</td>
+                                <td>{{ $department->description }}</td>
                                 <td>
-                                <a class="btn btn-primary btn-sm" onclick="openDeptEditBookModal('{{ route('admin.department.edit', $program) }}')">Edit</a>
-                                    <form action="{{ route('admin.department.destroy', $program) }}" method="POST" style="display: inline-block;">
+                                <a class="btn btn-primary" onclick="openDeptEditBookModal('{{ route('admin.department.edit', $department) }}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <form action="{{ route('admin.department.destroy', $department) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-trash text-white"></i>
+                                        </button>
                                     </form>
+
                                 </td>
                             </tr>
                         @endforeach
@@ -49,9 +53,22 @@
                 </table>
             </div>
         </div>
+
     </div>
+    <div class="bottom-right-container">
+            <button class="bg-primary bottom-right-button" data-toggle="modal" data-target="#CreateDepartment">
+
+            <i class="fa-solid fa-plus text-white px-1"></i>
+
+            </button>
+        </div>
 
 
     @include('admin.Departments.modal')
+
+        </div>
+    </div>
+</div>
+    
 
 @endsection

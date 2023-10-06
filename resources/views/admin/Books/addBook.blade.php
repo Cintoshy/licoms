@@ -47,8 +47,8 @@
                         placeholder="Title" required>
                 </div>
                 <div class="col-sm-6 mb-sm-0">
-                    <input type="text" class="form-control form-control-user" id="copy" name="copy" value=""
-                        placeholder="Copy" required>
+                    <input type="text" class="form-control form-control-user" id="volume" name="volume" value=""
+                        placeholder="Volume" required>
                 </div>
                 <div class="col-sm-6 mt-3 sm-0">
                     <input type="text" class="form-control form-control-user" id="author" name="author" value=""

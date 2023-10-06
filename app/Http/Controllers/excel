@@ -1,0 +1,540 @@
+   
+    
+public function exportCollectionProfile()
+{
+    $courses = Course::all();
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setCellValue('A1', 'Camarines Sur Polythecnic College');
+    $sheet->mergeCells('A1:B2');
+    $sheet->setCellValue('C1', 'WITHIN PRESCRIBED 5 YEAR COPYRIGHT');
+    $sheet->mergeCells('C1:N1');
+    $sheet->setCellValue('O1', 'GRAND TOTAL');
+    $sheet->mergeCells('O1:P2');
+    $sheet->setCellValue('Q1', '% Per Subject');
+    $sheet->mergeCells('Q1:Q3');
+    $sheet->setCellValue('R1', 'TITLES NEEDED');
+    $sheet->mergeCells('R1:R3');
+    $sheet->setCellValue('S1', '2018 BELOW');
+    $sheet->mergeCells('S1:T2');
+    
+    $sheet->setCellValue('C2', '2025');
+    $sheet->mergeCells('C2:D2');
+    $sheet->setCellValue('E2', '2024');
+    $sheet->mergeCells('E2:F2');
+    $sheet->setCellValue('G2', '2023');
+    $sheet->mergeCells('G2:H2');
+    $sheet->setCellValue('I2', '2022');
+    $sheet->mergeCells('I2:J2');
+    $sheet->setCellValue('K2', '2021');
+    $sheet->mergeCells('K2:L2');
+    $sheet->setCellValue('M2', 'PRINTED BOOKS');
+    $sheet->mergeCells('M2:M3');
+    $sheet->setCellValue('N2', 'E-BOOKS');
+    $sheet->mergeCells('N2:N3');
+
+    $sheet->setCellValue('A3', 'Code');
+    $sheet->setCellValue('B3', 'Course');
+    $sheet->setCellValue('C3', 'T');
+    $sheet->setCellValue('D3', 'V');
+    $sheet->setCellValue('E3', 'T');
+    $sheet->setCellValue('F3', 'V');
+    $sheet->setCellValue('G3', 'T');
+    $sheet->setCellValue('H3', 'V');
+    $sheet->setCellValue('I3', 'T');
+    $sheet->setCellValue('J3', 'V');
+    $sheet->setCellValue('K3', 'T');
+    $sheet->setCellValue('L3', 'V');
+    $sheet->setCellValue('M3', 'T');
+    $sheet->setCellValue('N3', 'V');
+    $sheet->setCellValue('O3', ' T');
+    $sheet->setCellValue('P3', ' V');
+    $sheet->setCellValue('S3', ' T ');
+    $sheet->setCellValue('T3', ' V ');
+    
+
+// Merge cells for rowspan and colspan
+// $sheet->mergeCells('F1:J2');
+    
+
+
+    $row = 4;
+    foreach ($courses as $course) {
+        $sheet->setCellValue('A' . $row, $course->course_code);
+        $sheet->setCellValue('B' . $row, $course->course_title);
+        $row++;
+    }
+    
+    //Auto Size Colum
+    $columnIterator = $sheet->getColumnIterator();
+    foreach ($columnIterator as $column) {
+        $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+    }
+    //Text Align Center
+    $centerAlignRange = ['A1:T3'];
+    foreach ($centerAlignRange as $range) {
+        $cellStyle = $sheet->getStyle($range);
+        $cellStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $cellStyle->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    }
+    
+
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'courses.xlsx';
+
+    $writer->save($filename);
+
+    return response()->download($filename)->deleteFileAfterSend();
+}
+
+
+
+public function exportCourses()
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Set headers with colspan and rowspan
+    $headers = [
+        ['CC', 'Courses', '2024', null, '2023', null, '2022', null, '2021', null, '2020', null, 'Printed Books', 'Electronics Books', 'Grand Total', null, '% per Subject', 'Titles Needed', '2019 Below', null],
+        [null, null, 'T', 'V', 'T', 'V', 'T', 'V', 'T', 'V', 'T', 'V', null, null, 'T', 'V', null, null, 'T', 'V'],
+    ];
+    $sheet->fromArray($headers, null, 'A1');
+
+    // Add data rows (replace this with your actual data)
+    $data = [
+        ['B7HT1', 'Ethical Hacking 2', 3, 2, 5, 5, 3, 4, 2, 5, 4, 5, 5, 2, 5, 3, 80, 4, 3, 3],
+        ['VY6O', 'Programming 2', 4, 3, 1, 4, 5, 3, 2, 5, 5, 3, 1, 4, 6, 3, 68, 7, 3, 2],
+        // ... add more rows
+    ];
+
+    $rowNumber = 3;
+    foreach ($data as $rowData) {
+        $sheet->fromArray($rowData, null, 'A' . $rowNumber);
+        $rowNumber++;
+    }
+
+    $filename = 'collection_profile.xlsx';
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save($filename);
+
+    return response()->download($filename)->deleteFileAfterSend();
+}
+
+public function exportCollections()
+{
+    $courses = Course::all(); // Assuming you have a Course model
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setCellValue('A1', 'Camarines Sur Polythecnic College'); // Move to F5
+    $sheet->mergeCells('A1:D1'); // Merge cells F5 to H5
+    $sheet->setCellValue('A2', 'Nabua Camarines Sur'); // Move to F5
+    $sheet->mergeCells('A2:D2');
+    $sheet->setCellValue('A5', 'Course Id');
+    $sheet->setCellValue('B5', 'Course Code');
+    $sheet->setCellValue('C5', 'Course Name');
+    $sheet->setCellValue('D5', 'Course Level');
+    $sheet->setCellValue('E5', 'Assigned Program');
+
+    $sheet->setCellValue('A5', 'Course Id');
+    $sheet->setCellValue('B5', 'Course Code');
+    $sheet->setCellValue('C5', 'Course Name');
+    $sheet->setCellValue('D5', 'Course Level');
+    $sheet->setCellValue('E5', 'Assigned Program');
+
+    $row = 6;
+    foreach ($courses as $course) {
+        $sheet->setCellValue('A' . $row, $course->id);
+        $sheet->setCellValue('B' . $row, $course->course_code);
+        $sheet->setCellValue('C' . $row, $course->course_title);
+        $sheet->setCellValue('D' . $row, $course->course_level);
+        $sheet->setCellValue('E' . $row, $course->assigned_program);
+        $row++;
+    }
+
+    $columnIterator = $sheet->getColumnIterator();
+    foreach ($columnIterator as $column) {
+        $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+    }
+
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'courses.xlsx';
+
+    $writer->save($filename);
+
+    return response()->download($filename)->deleteFileAfterSend();
+}
+
+    
+}
+
+public function reportIndex(){
+        $currentDate = Carbon::now();
+        $sixYearsAgo = $currentDate->copy()->subYears(6);
+        $fiveYearsAgo = $currentDate->copy()->subYears(5);
+        $fourYearsAgo = $currentDate->copy()->subYears(4);
+        $threeYearsAgo = $currentDate->copy()->subYears(3);
+        $twoYearsAgo = $currentDate->copy()->subYears(2);
+        $oneYearsAgo = $currentDate->copy()->subYears(1);
+
+        $approvedRequestedBooks = RequestedBooks::all();
+        
+        $accumulatedVolumes = [];
+        
+
+        foreach ($approvedRequestedBooks as $requestedBook) {
+            $courseName = $requestedBook->course->course_code;
+            $bookVolume = $requestedBook->book->volume;
+    
+            // Check if the course already exists in the accumulated volumes array
+            if (isset($accumulatedVolumes[$courseName])) {
+                // Add the book volume to the existing accumulated volume
+                $accumulatedVolumes[$courseName] += $bookVolume;
+            } else {
+                // Initialize the accumulated volume for the course
+                $accumulatedVolumes[$courseName] = $bookVolume;
+            }
+        }
+        dd($accumulatedVolumes);
+        $books = RequestedBooks::select('course_id', 'year')
+        ->groupBy('course_id', 'year')
+        ->get();
+
+        
+        
+        return view('admin.CollectionProfile.collection', compact('books', 'accumulatedVolumes','currentDate', 'sixYearsAgo', 'fiveYearsAgo', 'fourYearsAgo', 'threeYearsAgo', 'twoYearsAgo', 'oneYearsAgo'));
+    }
+
+
+
+    @extends('layout.layout')
+
+@section('content')
+<div class="container">
+
+                <div class="card shadow">
+
+                                <!-- Card Header - Dropdown -->
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <a href="{{ route('export.collection-profile') }}" class="btn btn-success">
+                    Export to Excel
+                </a>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Dropdown Header:</div>
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+            
+
+
+
+            @include('admin.CollectionProfile.modal')
+
+        </div>
+        </div>
+        </div>
+
+
+@endsection
+<h1 class="display-6 fw-bolder text-uppercase">Collection Profile</h1>
+
+
+
+
+<div class="card shadow mb-4">
+<div class="card-header">
+            <div class="row no-gutters align-items-center">
+                
+                <div class="col mr-2">
+                <h1 class="display-6 fw-bolder text-uppercase">Course Subject</h1>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Total Course</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $course->count() }}</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-graduation-cap fa-4x text-gray-500 pr-3"></i>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered text-center table-striped" width="100%" cellspacing="0">
+                <thead class="bg-gradient-info text-light">
+                    <tr>
+                    <th colspan="2" rowspan="2">CCS</th>
+                    <th colspan="10">WITHIN PRESCRIBED 5 YEARS COPYRIGHT</th>
+                    <th rowspan="2" colspan="2">Grand Total</th>
+                    <th rowspan="3">% Per Subject</th>
+                    <th rowspan="3">Titles Needed</th>
+                    <th rowspan="2" colspan="2">{{$fiveYearsAgo->year}} Below</th>
+                    </tr>
+                   <tr>
+            
+
+            @foreach (array_reverse($years) as $year)
+                <th colspan="2">{{ $year }}</th>
+            @endforeach
+
+        </tr>
+        <tr>
+            <th>Code</th>
+            <th>Courses</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+        </tr>
+</thead>
+        
+@foreach ($groupedBooks as $courseId => $yearsData)
+
+            @php
+                $courseTotalVolumes = 0;
+                $courseTotalTitles = 0;
+                $courseTotalVolumesBelow = 0;
+                $courseTotalTitlesBelow = 0;
+                $course = $yearsData->first()->first()->course;
+            @endphp
+            <tr class="table-danger">
+                <td>{{ $courseId }}</td>
+                <td>{{ $course->course_title }}</td>
+                @foreach (array_reverse($years) as $year)
+                    @php
+                        $yearData = $yearsData->get($year, [0 => ['total_volumes' => 0, 'total_titles' => 0]])[0];
+                        $courseTotalVolumes += $yearData['total_volumes'];
+                        $courseTotalTitles += $yearData['total_titles'];
+
+
+
+                    @endphp
+                    <td>{{ $yearData['total_titles'] }}</td>
+                    <td>{{ $yearData['total_volumes'] }}</td>
+                @endforeach
+                <td width="7%">{{ $courseTotalTitles }}</td>
+                <td width="7%">{{ $courseTotalVolumes }}</td>
+                <td>80%</td>
+                <td width="7%">
+                    @if ($courseTotalTitles >= 10)
+                        0
+                    @else
+                        {{ 10 - $courseTotalTitles }}
+                    @endif
+                </td>
+                        <td>{{ $courseTotalTitlesBelow }}</td>
+                        <td>{{ $courseTotalVolumesBelow }}</td>
+        @endforeach
+    </table>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-right-container">
+            <button class="bg-primary bottom-right-button" data-toggle="modal" data-target="#CreateCourse">
+
+            <i class="fa-solid fa-plus text-white px-1"></i>
+
+            </button>
+        </div>
+
+        @include('admin.CollectionProfile.modal')
+
+</div>
+</div>
+</div>
+
+
+
+
+@endsection
+
+
+
+@extends('layout.layout')
+
+@section('content')
+<div class="card shadow mb-4">
+<div class="card-header">
+                <div class="row d-flex align-items-center my-3">    
+            <div class="col-sm-6 d-flex">
+                <h1 class="display-6 fw-bolder text-uppercase">Collection Profile</h1>
+            </div>
+            <div class="col-sm-6">
+                <a href="{{ route('export.collection-profile') }}" class="btn btn-success">
+                    Export to Excel
+                </a>
+                    <div class="btn-group" role="group" aria-label="Button Group">
+
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#Modal2">
+                            <span class="text">Active Collection
+                            </span>
+                        </button>
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#Modal3">
+                            <span class="text">Min. Requirements
+                            </span>
+                        </button>
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#CompliedPercentage">
+                            <span class="text">Complied Percentage
+                            </span>
+                        </button>
+                    </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered text-center table-striped" width="100%" cellspacing="0">
+                <thead class="bg-gradient-info text-light">
+                    <tr>
+                    <th colspan="2" rowspan="2">CCS</th>
+                    <th colspan="10">WITHIN PRESCRIBED 5 YEARS COPYRIGHT</th>
+                    <th rowspan="2" colspan="2">Grand Total</th>
+                    <th rowspan="3">% Per Subject</th>
+                    <th rowspan="3">Titles Needed</th>
+                    <th rowspan="2" colspan="2">{{$fiveYearsAgo->year}} Below</th>
+                    </tr>
+                   <tr>
+            
+
+            @foreach (array_reverse($years) as $year)
+                <th colspan="2">{{ $year }}</th>
+            @endforeach
+
+        </tr>
+        <tr>
+            <th>Code</th>
+            <th>Courses</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+            <th>T</th>
+            <th>V</th>
+        </tr>
+</thead>
+        
+@foreach ($groupedBooks as $courseId => $yearsData)
+
+            @php
+                $courseTotalVolumes = 0;
+                $courseTotalTitles = 0;
+                $courseTotalVolumesBelow = 0;
+                $courseTotalTitlesBelow = 0;
+                $course = $yearsData->first()->first()->course;
+            @endphp
+            <tr class="table-danger">
+                <td>{{ $courseId }}</td>
+                <td>{{ $course->course_title }}</td>
+                @foreach (array_reverse($years) as $year)
+                    @php
+                        $yearData = $yearsData->get($year, [0 => ['total_volumes' => 0, 'total_titles' => 0]])[0];
+                        $courseTotalVolumes += $yearData['total_volumes'];
+                        $courseTotalTitles += $yearData['total_titles'];
+
+
+
+                    @endphp
+                    <td>{{ $yearData['total_titles'] }}</td>
+                    <td>{{ $yearData['total_volumes'] }}</td>
+                @endforeach
+                <td width="7%">{{ $courseTotalTitles }}</td>
+                <td width="7%">{{ $courseTotalVolumes }}</td>
+                <td>80%</td>
+                <td width="7%">
+                    @if ($courseTotalTitles >= 10)
+                        0
+                    @else
+                        {{ 10 - $courseTotalTitles }}
+                    @endif
+                </td>
+                        <td>{{ $courseTotalTitlesBelow }}</td>
+                        <td>{{ $courseTotalVolumesBelow }}</td>
+        @endforeach
+    </table>
+            </div>
+        </div>
+    </div>
+        @include('admin.CollectionProfile.modal')
+
+</div>
+</div>
+</div>
+
+
+
+@endsection
+
+
+<div class="row mb-3">
+            <div class="col-4">sefsef</div>
+                <div class="col-4">
+
+                <table class="table table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <td colspan="4">Active Collection</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Total Titles</td>
+                            <td colspan="2">Total Volumes</td>    
+                        </tr>
+                        <tr>
+                            <td colspan="2">ssfsef</td>
+                            <td colspan="2">wdawd</td>    
+                        </tr>
+                    </thead>
+                    <tbody>
+ 
+                        <tr>
+                            <td>E-Books</td>
+                            <td>Titles</td>
+                            <td>Volumes</td>    
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-light">
+                            <h4>Complied Percentage</h4>
+                        </div>
+                        <div class="card-body"><h1 class="text-danger fw-bolder">67%</h1></div>
+                        <div class="card-footer">Titles Needed: </div>
+                    </div>
+                </div>
+            </div>

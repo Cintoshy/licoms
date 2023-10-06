@@ -42,8 +42,8 @@
                         @csrf
                         <div class="form-group row">
                             <div class="col-sm-12 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="id" name="id" value=""
-                                    placeholder="Id Number" required>
+                                <input type="text" class="form-control form-control-user" id="user_id" name="user_id" value=""
+                                    placeholder="Employee ID" required>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -55,38 +55,45 @@
                                 <input type="text" class="form-control form-control-user" id="last_name" name="last_name" value=""
                                     placeholder="Last Name" required>
                             </div>
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="email" name="email" value=""
-                                    placeholder="Email" required>
+
+                            <div class="col-sm-12 mb-3 sm-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-user" id="email" name="email"
+                                        placeholder="CSPC Email" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">@cspc.edu.ph</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-sm-6 mb-sm-0">
+
+                            <div class="col-sm-4 mx-0 sm-0">
                                 <input type="text" class="form-control form-control-user" id="contact" name="contact" value=""
-                                    placeholder="Contact" required>
+                                    placeholder="Contact" oninput="validateContact(this)" required>
+                                <span class="mb-5 text-danger" id="digitCountSign"></span>
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <select class="form-control form-control-user" id="role" name="role">
-                                    <option value="" selected disabled>Type of User</option>
+                            <div class="col-sm-4 mb-3 sm-0">
+                                <select class="form-control form-control-user" id="role" name="role" required>
+                                    <option value="" selected disabled>Role</option>
                                     <option value="0">Admin</option>
                                     <option value="1">Program Chair</option>
                                     <option value="2">Librarian</option>
                                     <option value="3">Faculty</option>
                                 </select>
                             </div>
-                            <div class="col-sm-6 mb-sm-0">
+                            <div class="col-sm-4 mb-3 mx-0 sm-0 d-flex justify-content-end">
                                 <select class="form-control form-control-user" id="assigned_program" name="assigned_program">
-                                    <option value="" disabled selected>Assign Program</option>
+                                    <option value="" disabled selected>Program</option>
                                     @foreach ($allPrograms as $program)
                                         <option value="{{ $program->name }}">{{ $program->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
 
                             </div>
-                        <button href="{{ route('admin.users.index') }}" class="btn btn-primary btn-block">
-                            <i class="fas fa-plus"></i> Add User
-                        </button>
+                            <div>
+                            <button href="{{ route('admin.users.index') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">

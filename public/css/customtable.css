@@ -1,0 +1,73 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    font-size:xx-small;
+    border: 1px solid #000;
+    padding: 3px;
+    text-align: center;
+   
+}
+thead{
+    border: 1px solid #000;
+}
+th {
+    background-color: #83C8E4;
+}
+
+h6, h4{
+    margin: 0;
+}
+h6{
+    margin-top: 10px;
+}
+
+footer{
+    width: 100%;
+    position: fixed;
+    bottom: 20px;
+    right: 0px;
+    height: 10px;
+    text-align: right;
+    line-height: 35px;
+    border-top: 1px solid black;
+    font-size: 10px;
+}
+header{
+    margin: 0;
+    text-align: center;
+}
+
+
+  
+  .card { 
+    margin-top: 10%!important;
+    display: inline-block;
+    width: 31%; 
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin:0 5px;
+  }
+  
+  .card:first-child {
+    margin-left: 0; 
+  }
+  
+  .card:last-child {
+    margin-right: 0; 
+  }
+  #body-table{
+    position: fixed;
+    width : auto ;
+    /* margin-bottom: -79.5em !important; */
+    margin-top:50%!important;
+
+  }
+  #pdfLogo {
+    margin: -5% -5% 0 !important;
+    width: 110% !important;
+}
+
+  

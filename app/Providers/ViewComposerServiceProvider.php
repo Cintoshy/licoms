@@ -14,7 +14,7 @@ class ViewComposerServiceProvider extends ServiceProvider
         // Using a view composer to bind $user to all views
         view()->composer('*', function ($view) {
             $user = Auth::user();
-            $view->with('user', $user);
+            $view->with('user_role', $user);
         });
     }
 }

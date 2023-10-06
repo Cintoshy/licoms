@@ -1,37 +1,36 @@
 @extends('layout.layout')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Approved Books</h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8 mb-3">
-                    <a href="" class="btn btn-success btn-icon-split">
-                        <span class="icon text-white-50">
-                            <i class="fas fa-plus mt-1"></i>
-                        </span>
-                        <span class="text">Convert to Excel</span>
-                    </a>
+<div class="card shadow mb-4">
+    <div class="card-header">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <h1 class="display-6 fw-bolder text-uppercase">Approved Books</h1>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-circle-check fa-3x text-success pr-3"></i>
                 </div>
             </div>
+        </div>
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Book Title</th>
                             <th>Course Code</th>
                             <th>Faculty</th>
-                            <th>Librarian</th>
                             <th>Program Chair</th>
+                            <th>Librarian</th>
                             <th>Status</th>
+                            <th>Date Approved</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                     @foreach($requestedBooks as $requestedBook)
                         <tr>
-                            <td>{{ $requestedBook->book->title }}</td>
+                            <td width="30%">{{ $requestedBook->book->title }}</td>
                             <td>{{ $requestedBook->course_id }}</td>
                             <td>
                                 @if ($requestedBook->faculty)
@@ -41,20 +40,30 @@
                                 @endif
                             </td>
                             <td>
-                                @if ($requestedBook->librarian)
-                                    {{ $requestedBook->librarian->first_name }} {{ $requestedBook->librarian->last_name }}
-                                @else
-                                    auto-approved
-                                @endif
-                            </td>
-                            <td>
                                 @if ($requestedBook->programChair)
                                     {{ $requestedBook->programChair->first_name }} {{ $requestedBook->programChair->last_name }}
+                                @else
+                                auto-approved
+                                @endif
+                            </td>
+                            
+                            <td>
+                                @if ($requestedBook->librarian)
+                                    {{ $requestedBook->librarian->first_name }} {{ $requestedBook->librarian->last_name }}
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="fw-bold bg-success">{{ $requestedBook->status }}</td>
+                            <td class="fw-bold bg-gradient-success text-light">{{ $requestedBook->status }}</td>
+                            <td>{{ $requestedBook->approved_at->format('Y-m-d h:i A') }}</td>
+                            <td width="10%  ">
+                                <a href="{{ route('all.approvedBookPage.show', $requestedBook->id) }}" class="btn btn-primary btn-sm w-100">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-eye mt-1"></i>
+                                        </span>
+                                        <span class="text">View</span>
+                                    </a>
+                            </td>
                             </tr>
                         @endforeach
                     </tbody>

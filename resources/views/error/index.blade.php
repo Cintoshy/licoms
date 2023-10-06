@@ -23,7 +23,7 @@
                             We could not find the page you were looking for.
                             Meanwhile, you may
                         </p>
-                        <button href="" class="btn btn-primary btn-icon-split btn-sm mb-3">
+                        <button href="{{ url()->previous() }}" class="btn btn-primary btn-icon-split btn-sm mb-3">
                             <span class="icon text-white-50"><i class="fas fa-arrow-left px-1 my-1"></i></span>
                             <span class="text pe-2">Return Page</span>
                         </button>

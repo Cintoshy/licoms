@@ -54,3 +54,14 @@
   });
 
 })(jQuery); // End of use strict
+const emailInput = document.getElementById('email');
+const emailDomain = document.querySelector('.email-domain');
+
+emailInput.addEventListener('input', function() {
+  emailDomain.textContent = '@my.cspc.edu.ph';
+  if (emailInput.value.trim() !== '') {
+    emailDomain.style.display = 'none';
+  } else {
+    emailDomain.style.display = 'inline';
+  }
+});

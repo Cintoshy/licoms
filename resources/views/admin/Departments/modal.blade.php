@@ -20,8 +20,8 @@
                     <div class="modal fade" id="CreateDepartment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-light text-dark">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Department & Program</h5>
+                <div class="modal-header bg-gradient-light text-dark mb-2">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Department</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -37,23 +37,14 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.departments.store') }}" method="post">
+                    <form action="{{ route('admin.department.store') }}" method="post">
                         @csrf
                         <div class="form-group row">
-                        <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="code" name="code" value=""
-                                    placeholder="Department Code" required>
-                            </div>
-                            <div class="col-sm-6 mb-3 sm-0">
-                                <input type="text" class="form-control form-control-user" id="name" name="name" value=""
-                                    placeholder="Program" required>
-                            </div>
-
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" id="department" name="department" value=""
+                            <div class="col-sm-12 mb-3 sm-0">
+                                <input type="text" class="form-control form-control-user" id="department_name" name="department_name" value=""
                                     placeholder="Department" required>
                             </div>
-                            <div class="col-sm-6 mb-sm-0">
+                            <div class="col-sm-12 sm-0">
                                 <input type="text" class="form-control form-control-user" id="description" name="description" value=""
                                     placeholder="Description" required>
                             </div>

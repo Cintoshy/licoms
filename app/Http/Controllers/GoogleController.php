@@ -12,6 +12,10 @@ class GoogleController extends Controller
 {
     public function index()
     {
+        if (auth()->check()) {
+            return back();
+        }
+    
         return view('landing');
     }
 
@@ -21,37 +25,34 @@ class GoogleController extends Controller
     }
 
     public function callbackFromGoogle()
-    {
-        try {
-            $user = Socialite::driver('google')->user();
-            $is_user = User::where('email', $user->getEmail())->first();
+{
+    try {
+        $user = Socialite::driver('google')->user();
+        $is_user = User::where('email', $user->getEmail())->first();
+        
+        
+        if ($is_user) {
+            Auth::login($is_user, true); // Login the user and "remember" the session
 
-            if ($is_user) {
-                Auth::login($is_user, true); // Login the user and "remember" the session
-
-                // Check user role and redirect accordingly
-                if ($is_user->role == '0') {
-                    return redirect()->route('home');
-                } elseif ($is_user->role == '1') {
-                    return redirect()->route('program-chair.index'); 
-                } elseif ($is_user->role == '2') {
-                    return redirect()->route('librarian.dashboard'); 
-                } elseif ($is_user->role == '3') {
-                    return redirect()->route('faculty.dashboard'); 
-                }
-
-                return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');
-            
+            // Check user role and redirect accordingly
+            if ($is_user->role == '0') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($is_user->role == '1') {
+                return redirect()->route('program-chair.index'); 
+            } elseif ($is_user->role == '2') {
+                return redirect()->route('librarian.dashboard'); 
+            } elseif ($is_user->role == '3') {
+                return redirect()->route('faculty.dashboard'); 
+            }
         } else {
             return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');
-            //return "Your email is not eligible for the website.";
         }
         
-        } catch (\Throwable $th) {
-            throw $th;
-        }
+    } catch (\Throwable $th) {
+        return redirect()->route('confirmLogout')->with('error', 'Something went wrong. Please try again later.');
+    
     }
-
+}
     public function logout()
     {
         Auth::logout();
