@@ -56,6 +56,7 @@ body{
   animation: zoom-in-zoom-out 1.2s;
   margin: 0px;
 
+
 }
 .read .ask .header{
   margin-top: 15px;
@@ -85,7 +86,7 @@ body{
 }
 
 .error-message{
-  background-color: white;
+  background-color: rgb(214, 214, 214);
   transition: all 0.6s;
   width: 500px;
   border-radius: 10% / 50%;
@@ -147,6 +148,12 @@ body{
     
   
   }
+  #program_name{
+    display: none;
+  }
+  #selectpickerrr{
+    color: white;
+  }
 }
 
     @media (max-width: 1500px) {
@@ -156,6 +163,9 @@ body{
         }
         .full-text {
             display: none; /* Hide the full text */
+        }
+        .btn span i{
+          display: none;
         }
     }
 
@@ -174,8 +184,13 @@ body{
           /* Reduce font size for table cells on small screens */
           #tableData td,
           #tableData th {
-              font-size: 10px;
+              font-size: 12px;
           }
+      }
+
+      #collectonProfile td {
+        padding: 3px;
+        font-size: small;
       }
 
 

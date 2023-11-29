@@ -24,7 +24,7 @@ class ProgramController extends Controller
 
         $input = $request->all();
         Program::create($input);
-        return redirect('admin/programs')->with('success', 'Program Addedd!');
+        return redirect('admin/programs')->with('checked', 'Program Added');
     }
 
     public function edit(Program $program)
@@ -41,6 +41,7 @@ class ProgramController extends Controller
             'name' => 'required',
             'description' => 'required',
             'department' => 'required',
+            'minimum_req' => 'required',
         ]);
     
         // Update the user with the validated data
@@ -48,6 +49,7 @@ class ProgramController extends Controller
             'name' => $validatedData['name'],
             'description' => $validatedData['description'],
             'department' => $validatedData['department'],
+            'minimum_req' => $validatedData['minimum_req'],
         ]);
     
         // Redirect to the index page with a success message

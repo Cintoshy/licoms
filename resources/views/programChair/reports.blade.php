@@ -19,7 +19,7 @@
     </div>
     <div class="container-fluid">
         <div class="table-responsive">
-            <table class="table table-bordered text-center" width="100%" cellspacing="0">
+            <table class="table table-bordered text-center" id="collectonProfile" width="100%" cellspacing="0" padding="0%">
                 <thead class="bg-gradient-info text-light">
                     <tr>
                         <th colspan="2" rowspan="2">{{$books->first()->course->assigned_program ?? $ProgramCode}}</th>
@@ -58,6 +58,8 @@
                     $additionalPercentage = 0;
                     $allTitlesGrantTotal = 0;
                     $courseGroups = collect();
+                    $grandTotalresultPercentage = 0;
+                    $totalAdditionalPercentage = 0;
 
                 @endphp
                 @foreach ($groupedBooks as $courseId => $courseGroup)
@@ -93,13 +95,11 @@
                                 $totalTitles = 0;
                                 $totalVolumes = 0;
                                 $lastYearToRemoveData = reset($years);
-                                
                             @endphp
                             @foreach ($courseGroup as $book)
                                 @if ($book->book_year == $year)
                                     @php
                                         $totalTitles += $book->total_titles;
-                                        $totalVolumes += $book->total_volumes;
                                         $totalVolumes += $book->total_volumes;
                                     @endphp
                                 @endif
@@ -109,13 +109,13 @@
                             @php
                                 $grandTotalTitles += $totalTitles;
                                 $grandTotalVolumes += $totalVolumes;
-                                $result = ($grandTotalTitles >= 5) ? 100 : ($grandTotalTitles * 20);
+                                $result = ($grandTotalTitles >= 3) ? 100 : ($grandTotalTitles * 20);
 
-                                $excessTitles = ($grandTotalTitles >= 5) ? ($grandTotalTitles - 5) : 0;
+                                $excessTitles = ($grandTotalTitles >= 3) ? ($grandTotalTitles - 3) : 0;
 
                                 if ($excessTitles > 0) {
                                     // Calculate the excessTitles percentage
-                                    $percentage = ($excessTitles <= 5) ? ($excessTitles * 20) : 100;
+                                    $percentage = ($excessTitles <= 3) ? ($excessTitles * 20) : 100;
                                 } else {
                                     $percentage = 0;
                                 }
@@ -130,23 +130,35 @@
                         $grandTotalresultPercentage = $TotalresultPercentage / $rowCount;
                         $totalAdditionalPercentage = $additionalPercentage / $rowCount;
 
-                        if ($grandTotalTitles >= 5) {
+                        if ($grandTotalTitles >= 3) {
                             $titleNeeded = 0;
                         } else {
-                            $titleNeeded = 5 - $grandTotalTitles;
+                            $titleNeeded = 3 - $grandTotalTitles;
                         }
                         @endphp
                         <td>{{ $titleNeeded }}
                         </td>
-                        
-                            <td>
+                        @php
+                    $nextTotalTitlesNeeded = 0;
+                    $advanceyear = 0;
+                    @endphp
+
+                    @foreach ($courseGroup as $book)
+                        @php
+                        $nextTotalTitlesNeeded = ($book->book_year == $lastYearToRemoveData) ? $book->total_titles : $nextTotalTitlesNeeded;
+                        $advanceyear = ($book->book_year == 2024);
+                        @endphp
+                    @endforeach
+
+                    <td>{{ max(0, $nextTotalTitlesNeeded - $advanceyear) }}</td>
+                            <!-- <td>
                                 @php
-                                    $year = $courseGroup->first()->book_year;
+                                    $yearsss = 2019;
                                     $grandTotalTitlesNeeded += $titleNeeded;
-                                    $nextTotalTitlesNeeded = ($year == $lastYearToRemoveData) ? $book->total_titles : 0;
+                                    $nextTotalTitlesNeeded = ($yearsss == $lastYearToRemoveData) ? $book->total_titles : 0;
                                 @endphp
                                 {{ $nextTotalTitlesNeeded }}
-                            </td>
+                            </td> -->
                         @php
                             $grandTotalNextTitlesNeeded += $nextTotalTitlesNeeded;
                             $totalTitlesBelow = 0;

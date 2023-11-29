@@ -16,11 +16,16 @@ class AddAssignedProgramToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Add the assigned_program column
             $table->string('assigned_program')->nullable();
+            $table->string('assigned_department')->nullable();
 
             // Add a foreign key constraint referencing the name column in the programs table
             $table->foreign('assigned_program')
                 ->references('name')
                 ->on('programs')
+                ->onDelete('set null');
+            $table->foreign('assigned_department')
+                ->references('department_name')
+                ->on('departments')
                 ->onDelete('set null');
         });
     }

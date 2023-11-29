@@ -7,13 +7,15 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Program;
+use App\Models\Department;
 
 class UserController extends Controller
 {
     public function index()
     {   $allPrograms = Program::all();
+        $departments = Department::all();
         $employees = User::all();
-        return view('admin.user-type.index', compact('employees', 'allPrograms'));
+        return view('admin.user-type.index', compact('employees', 'allPrograms', 'departments'));
     }
     /*
     public function create()
@@ -26,10 +28,21 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {   
         $email = $request->input('email') . '@cspc.edu.ph';
+
+        // Check if a user with the same email already exists
+        $existingUser = User::where('email', $email)->first();
+
+        if ($existingUser) {
+            // Handle the case where the email already exists
+            // You can return an error message or redirect back with a message
+            return redirect()->back()->with('error', 'Email address is already assigned.');
+        }
+
         $input = $request->all();
         $input['email'] = $email;
         User::create($input);
-        return redirect('admin/users')->with('success', 'User Addedd!');
+
+        return redirect('admin/users')->with('checked', 'User Added');
     }
 
 

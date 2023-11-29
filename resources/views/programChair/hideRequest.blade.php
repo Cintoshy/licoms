@@ -16,7 +16,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-            <table class="table table-lg table-bordered text-dark table-striped" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-lg table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>CN</th>
@@ -29,11 +29,11 @@
                     <tbody>
                         @foreach($books as $book)
                             <tr >
-                                <td class="fw-bold">{{ $book->id }}</td>
-                                <td class="fw-bold">{{ $book->title }}</td>
+                                <td class="fw-bold">{{ $book->call_number }}</td>
+                                <td class="fw-bold text-uppercase">{{ $book->title }}</td>
                                 <td>{{ $book->author }}</td>
                                 <td>{{ $book->publish }}</td>
-                                <td>
+                                <td width="12%">
                                 <form class="m-0" method="POST" action="{{ route('pg.acceptHideRequest', $book->id) }}">
                                         @csrf
                                         @method('PUT')

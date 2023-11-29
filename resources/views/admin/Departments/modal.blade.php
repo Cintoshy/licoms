@@ -37,17 +37,21 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.department.store') }}" method="post">
+                    <form action="{{ route('admin.department.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
                             <div class="col-sm-12 mb-3 sm-0">
                                 <input type="text" class="form-control form-control-user" id="department_name" name="department_name" value=""
                                     placeholder="Department" required>
                             </div>
-                            <div class="col-sm-12 sm-0">
+                            <div class="col-sm-12 mb-3 sm-0">
                                 <input type="text" class="form-control form-control-user" id="description" name="description" value=""
                                     placeholder="Description" required>
                             </div>
+                            <div class="col-sm-12 sm-0">
+                            <input type="file" name="logo" accept=".jpg, .jpeg, .png, .svg" required>
+                            </div>
+
 
 
                             </div>

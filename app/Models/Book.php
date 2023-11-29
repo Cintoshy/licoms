@@ -18,16 +18,11 @@ class Book extends Model
         'access_no',
         'year',
         'publish',
-        'availability',
+        'availabilty_program',
         'program_hide_request',
         'program_hidden',
     ];
 
-    // Scope to retrieve only available books
-    public function scopeAvailable($query)
-    {
-        return $query->where('availability', true);
-    }
 
     public function programs()
     {

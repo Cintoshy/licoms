@@ -25,6 +25,7 @@ class User extends Authenticatable
         'contact',
         'role',
         'assigned_program',
+        'assigned_department',
         
     ];
 
@@ -50,7 +51,12 @@ class User extends Authenticatable
 
     public function assignedProgram()
     {
-        return $this->belongsTo(Program::class, 'assigned_program', 'name');
+        return $this->belongsTo(Program::class, 'assigned_program', 'name');    
+    }
+
+    public function assignedDepartment()
+    {
+        return $this->belongsTo(Department::class, 'assigned_department', 'department_name');
     }
 
     

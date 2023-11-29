@@ -19,6 +19,7 @@ class Program extends Model
         'name',
         'description',
         'department',
+        'minimum_req',
     ];
 
     /**
@@ -31,10 +32,12 @@ class Program extends Model
         return $this->hasMany(User::class, 'assigned_program', 'name');
     }
 
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class, 'department', 'department_name');
-    }
+
+    public function department()
+{
+    return $this->hasMany(Department::class, 'department', 'department_name');
+}
+
 
     public function books()
     {

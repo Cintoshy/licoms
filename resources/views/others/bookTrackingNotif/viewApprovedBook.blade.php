@@ -16,7 +16,7 @@
                         </div>
                         </div>
                     <div>
-                    <div class="font-weight-bold">"{{ $approvedBook->book->title }}" has been Approved <span class="fw-bolder text-danger">{{ $approvedBook->librarian->first_name }} {{ $approvedBook->librarian->last_name }}</span> to the Course Subject "{{ $approvedBook->course_id }}"</div>
+                    <div class="font-weight-bold">"{{ $approvedBook->book->title }}" has been Approved <span class="fw-bolder text-danger">{{ $approvedBook->librarian->first_name ?? '-' }} {{ $approvedBook->librarian->last_name ?? $approvedBook->librarian}}</span> to the Course Subject "{{ $approvedBook->course_id }}"</div>
                          <span class="small text-gray-500">{{ $approvedBook->approved_at }}</span>
                     </div>
                     </div>
@@ -68,12 +68,12 @@
                         <td class="text-left">{{ $approvedBook->faculty ? $approvedBook->faculty->first_name . ' ' . $approvedBook->faculty->last_name : 'None' }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">PROGRAM CHAIR</th>
-                        <td class="text-left">{{ $approvedBook->programChair ? $approvedBook->programChair->first_name . ' ' . $approvedBook->programChair->last_name : 'None' }}</td>
-                        </tr>
-                        <tr>
                         <th scope="row">LIBRARIAN</th>
                         <td class="text-left">{{ $approvedBook->librarian ? $approvedBook->librarian->first_name . ' ' . $approvedBook->librarian->last_name : 'None' }}</td>
+                        </tr>
+                        <tr>
+                        <th scope="row">PROGRAM CHAIR</th>
+                        <td class="text-left">{{ $approvedBook->programChair ? $approvedBook->programChair->first_name . ' ' . $approvedBook->programChair->last_name : 'Unavailable user' }}</td>
                         </tr>
                         <tr>
                         <th scope="row">DATE APPROVED</th>

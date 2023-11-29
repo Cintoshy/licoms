@@ -14,7 +14,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered " id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Book Title</th>
@@ -23,13 +23,13 @@
                             <th>Program Chair</th>
                             <th>Status</th>
                             <th>Updated at</th>
-                            <th>Action</th>
+                            <th width="10%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                     @foreach($requestedBooks as $requestedBook)
                         <tr>
-                            <td>{{ $requestedBook->book->title }}</td>
+                            <td class="fw-bolder text-uppercase">{{ $requestedBook->book->title }}</td>
                             <td>{{ $requestedBook->course_id }}</td>
                             <td>
                                 @if ($requestedBook->faculty)

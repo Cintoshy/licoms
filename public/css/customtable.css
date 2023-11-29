@@ -5,7 +5,7 @@ table {
 th, td {
     font-size:xx-small;
     border: 1px solid #000;
-    padding: 3px;
+    padding: 0 3px;
     text-align: center;
    
 }
@@ -23,17 +23,6 @@ h6{
     margin-top: 10px;
 }
 
-footer{
-    width: 100%;
-    position: fixed;
-    bottom: 20px;
-    right: 0px;
-    height: 10px;
-    text-align: right;
-    line-height: 35px;
-    border-top: 1px solid black;
-    font-size: 10px;
-}
 header{
     margin: 0;
     text-align: center;
@@ -42,7 +31,7 @@ header{
 
   
   .card { 
-    margin-top: 10%!important;
+    margin-top: 8%!important;
     display: inline-block;
     width: 31%; 
     background-color: #f0f0f0;
@@ -62,7 +51,7 @@ header{
     position: fixed;
     width : auto ;
     /* margin-bottom: -79.5em !important; */
-    margin-top:50%!important;
+    margin-top: 45%!important;
 
   }
   #pdfLogo {
@@ -70,4 +59,41 @@ header{
     width: 110% !important;
 }
 
-  
+footer {
+  position: fixed;
+  bottom: 80px;
+  height: auto; /* Change height to auto to accommodate the content */
+  font-size: 8px;
+  width: 100%; /* Ensure the footer spans the entire width of the page */
+}
+
+
+.signature {
+  padding: 10px;
+  border: 1px solid black;
+  width: 25%; /* Set the width to 50% to make them side by side */
+  float: left; /* Float the signature divs to the left */
+  box-sizing: border-box; /* Include padding and border in the width */
+  margin-right: 10px;
+}
+
+.signature h4 {
+  font-weight: bolder;
+  text-decoration: underline;
+  text-align: center;
+}
+
+.signature h5 {
+  text-align: center;
+  margin: 2px;
+  padding: 0;
+}
+
+#GrandTotal{
+  position: fixed;
+  bottom: 80px;
+  width: 150px;
+  right: 0px;
+  font-weight: bolder;
+}
+

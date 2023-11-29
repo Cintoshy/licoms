@@ -1,11 +1,13 @@
 @extends('layout.layout')
 
 @section('content')
+@include('flash_message')
 <div class="card shadow mb-4">
     <div class="card-header">
             <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
-                <h1 class="display-6 fw-bolder text-uppercase">Your Book Evaluation Log</h1>
+                <h1 class="display-6 fw-bolder text-uppercase">Book Evaluation</h1>
+                <div class="h6 mb-0">Cancellation Activity</div>
                 </div>
                 <div class="col-auto">
                     <i class="fas fa-regular fa-hourglass-half fa-4x text-gray-500 pr-3"></i>

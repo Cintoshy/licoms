@@ -80,14 +80,23 @@
                                     <option value="3">Faculty</option>
                                 </select>
                             </div>
+
                             <div class="col-sm-4 mb-3 mx-0 sm-0 d-flex justify-content-end">
-                                <select class="form-control form-control-user" id="assigned_program" name="assigned_program">
+                                <select class="form-control form-control-user" id="assigned_program" name="assigned_program" style="display: none;" required>
                                     <option value="" disabled selected>Program</option>
                                     @foreach ($allPrograms as $program)
                                         <option value="{{ $program->name }}">{{ $program->name }}</option>
                                     @endforeach
                                 </select>
+                            </div>
 
+                            <div class="col-sm-4 mb-3 mx-0 sm-0 d-flex justify-content-end">
+                                <select class="form-control form-control-user" id="assigned_department" name="assigned_department" style="display: none;" required>
+                                    <option value="" disabled selected>Department</option>
+                                    @foreach ($departments as $department)
+                                        <option value="{{ $department->department_name }}">{{ $department->department_name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div>
                             <button href="{{ route('admin.users.index') }}" class="btn btn-primary btn-block">
@@ -99,5 +108,33 @@
                 <div class="modal-footer">
                     <h6 class="text-primary">LICOMS</h6>
                 </div>
-                
+                <script>
+                    // Get a reference to the role select element
+                    var roleSelect = document.getElementById('role');
 
+                    // Get references to the select elements that should be shown/hidden
+                    var programSelect = document.getElementById('assigned_program');
+                    var departmentSelect = document.getElementById('assigned_department');
+
+                    // Add an event listener to the role select element
+                    roleSelect.addEventListener('change', function () {
+                        // Get the selected value
+                        var selectedRole = roleSelect.value;
+
+                        // Hide all select elements initially
+                        programSelect.style.display = 'none';
+                        departmentSelect.style.display = 'none';
+
+                        programSelect.removeAttribute('required');
+                        departmentSelect.removeAttribute('required');
+
+                        // Based on the selected role, show the relevant select element
+                        if (selectedRole === '1') {
+                            programSelect.style.display = 'block';
+                            programSelect.setAttribute('required', 'required'); // Add "required" for Program Chair
+                        } else if (selectedRole === '2') {
+                            departmentSelect.style.display = 'block';
+                            departmentSelect.setAttribute('required', 'required'); // Add "required" for Librarian
+                        }
+                    });
+                </script>

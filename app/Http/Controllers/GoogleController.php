@@ -28,12 +28,13 @@ class GoogleController extends Controller
 {
     try {
         $user = Socialite::driver('google')->user();
-        $is_user = User::where('email', $user->getEmail())->first();
         
+        $is_user = User::where('email', $user->getEmail())->first();
+
+        session(['profilePictureUrl' => $user->getAvatar()]);
         
         if ($is_user) {
             Auth::login($is_user, true); // Login the user and "remember" the session
-
             // Check user role and redirect accordingly
             if ($is_user->role == '0') {
                 return redirect()->route('admin.dashboard');
@@ -47,6 +48,7 @@ class GoogleController extends Controller
         } else {
             return redirect()->route('licoms')->with('error', 'Sorry, your email is not authorized to enter this page!');
         }
+
         
     } catch (\Throwable $th) {
         return redirect()->route('confirmLogout')->with('error', 'Something went wrong. Please try again later.');

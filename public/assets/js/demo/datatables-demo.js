@@ -112,6 +112,11 @@ $(document).ready(function() {
 
   });
 });
+function closeSnackbar() {
+  var snackbar = document.getElementById("snackbar");
+  snackbar.style.display = "none";
+}
+
 $(document).ready(function() {
   $('#index').DataTable({
     dom: 'lfrti',
@@ -142,6 +147,11 @@ $(document).ready(function() {
     searchInput.val(selectedOption);
   });
 });
+$(document).ready(function() {
+  $('.selectpicker').selectpicker();
+});
+
+
 
 function openEditUserModal(editUserUrl) {
   // Perform any additional actions before opening the modal
@@ -460,4 +470,3 @@ function submitReportForm() {
   // Here's an example of submitting the form with the ID "reportForm":
   document.getElementById('reportForm').submit();
 }
-

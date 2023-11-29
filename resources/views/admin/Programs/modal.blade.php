@@ -49,7 +49,7 @@
                                     placeholder="Description" required>
                             </div>
 
-                            <div class="col-sm-12 sm-0">
+                            <div class="col-sm-12 mb-3 sm-0">
                                 <select class="form-control form-control-user" id="department" name="department" required>
                                     <option value="" disabled selected>Department</option>
                                     @foreach ($departments as $department)
@@ -57,6 +57,11 @@
                                     @endforeach
                                 </select>
 
+                            </div>
+
+                            <div class="col-sm-12 sm-0">
+                                <input type="number" class="form-control form-control-user" id="minimum_req" name="minimum_req" value=""
+                                    placeholder="Minimum Req" min="1" max="10" required>
                             </div>
 
 

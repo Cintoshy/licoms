@@ -50,7 +50,7 @@
                             @csrf
                             <div class="form-group">
                                 <label for="file">Choose Excel File:</label>
-                                <input type="file" name="file" class="form-control-file">
+                                <input type="file" name="file" class="form-control-file" accept=".xlsx, .xls">
                             </div>
                             <button type="submit" class="btn btn-primary">Import</button>
                         </form>
@@ -112,9 +112,6 @@
                             <!-- <div class="col-sm-6 my-3 sm-0">
                                 <select class="form-control form-control-user" id="assigned_program" name="assigned_program" required>
                                     <option value="" disabled selected>Program</option>
-                                    @foreach ($programs as $program)
-                                        <option value="{{ $program->name }}">{{ $program->name }}</option>
-                                    @endforeach
                                 </select>
 
                             </div> -->

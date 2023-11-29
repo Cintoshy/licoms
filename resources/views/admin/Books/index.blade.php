@@ -87,7 +87,6 @@
                             <th>Year</th>
                             <th>Created at</th>
                             <th width="13%">Action</th>
-                            <th>Deadline</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,21 +109,9 @@
                                     <form action="{{ route('admin.books.destroy', $book) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger mt-1"><i class="fas fa-trash text-white"></i></button>
+                                        <button type="button" class="btn btn-danger mt-1" data-toggle="modal" data-target="#deleteBookModal{{$book->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.Books.deleteModal')
                                     </form>
-                                </td>
-                                <td>
-                                    @php
-                                        $dueDate = $book->created_at->addWeeks(2);
-                                        $now = now();
-                                        $remainingDays = $dueDate->diffInDays($now);
-                                    @endphp
-                                    
-                                    @if ($now > $dueDate)
-                                        Delayed
-                                    @else
-                                        {{ $remainingDays }} days remaining
-                                    @endif
                                 </td>
                             </tr>
                         @endforeach

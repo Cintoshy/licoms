@@ -35,8 +35,7 @@ class BookController extends Controller
         $years = Book::orderBy('year')
             ->distinct('year')
             ->get();
-    
-
+        
         $query = Book::query();
 
     
@@ -94,7 +93,7 @@ class BookController extends Controller
         $input = $request->all();
         $input['access_no'] = json_encode($input['access_no']);
         Book::create($input);
-        return redirect('admin/listBooks')->with('success', 'Book Added!');
+        return redirect('admin/listBooks')->with('checked', 'Book Added');
     }
 
     public function edit(Book $book)
@@ -196,9 +195,23 @@ class BookController extends Controller
     {   
         // Get the associated book
         $book = $requestedBook->book;
-    
-        // Update the availability of the book to true
-        $book->update(['availability' => true]);
+
+        $facId = Auth::id();
+
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
+
+        // Get the program code for the current faculty
+        $facultyProgramCode = Auth::user()->assigned_program;
+
+        // Check if the faculty program is in the current programs
+        if (in_array($facultyProgramCode, $currentPrograms)) {
+            // Remove the program from the array
+            $currentPrograms = array_values(array_diff($currentPrograms, [$facultyProgramCode]));
+
+            // Update the book's availability_program attribute
+            $book->availabilty_program = json_encode($currentPrograms);
+            $book->save();
+        }
     
         // Delete the book request
         $requestedBook->delete();
@@ -213,18 +226,58 @@ class BookController extends Controller
         $requestedBooks = RequestedBooks::all();
         return view('admin.Books.allStatus', compact('requestedBooks'));
     }
+    public function pcIndex()
+    {
+        $user = Auth::user();
+        $programId = $user->assigned_program;
 
-    public function pgIndex()
+        $currentDate = Carbon::now();
+    
+        $books = RequestedBooks::where('program_name', $programId)->get();
+        
+        $approvedBooks = RequestedBooks::where('status', 'Approved')
+        ->where('program_name', $programId)->get();
+
+        $pendingBooks = RequestedBooks::whereIn('status', ['Verified', 'Selected'])
+        ->where('program_name', $programId)->get();
+
+        $prescribedYears = range($currentDate->copy()->subYears(4)->year, $currentDate->year);
+            $requestedBooksByYear = RequestedBooks::join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('books.year, COUNT(requested_books.id) as title_count')
+            ->whereIn('books.year', $prescribedYears) // Filter by the last 4 years
+            ->where('requested_books.status', 'Approved')
+            ->where('requested_books.program_name', $programId)
+            ->groupBy('books.year')
+            ->orderBy('books.year', 'asc')
+            ->get();
+            $resultArray = [];
+
+    // Initialize the array with all years and set title count to 0
+    foreach ($prescribedYears as $year) {
+        $resultArray[$year] = 0;
+    }
+
+    // Fill in the actual title counts for existing years
+    foreach ($requestedBooksByYear as $result) {
+        $year = $result->year;
+        $resultArray[$year] = $result->title_count;
+    }
+
+
+
+        return view('programChair.index', compact('books', 'approvedBooks', 'pendingBooks', 'prescribedYears', 'resultArray'));
+    }
+    public function pcBookEvaluation()
     {
         $user = Auth::user();
         $programId = $user->assigned_program;
     
-        // Retrieve requested books for the same program as the program chair
+        // Retrieve requested books for the same program as the program chair   
         $requestedBooks = RequestedBooks::where('program_name', $programId)
                                         ->where('status', 'Selected')
                                         ->get();
     
-        return view('programChair.index', compact('requestedBooks'));
+        return view('programChair.book_evaluation', compact('requestedBooks'));
     }
 
     
@@ -235,22 +288,65 @@ class BookController extends Controller
         $user = Auth::user();
         $programId = $user->assigned_program;
 
-        $books = Book::available()
-        ->where(function ($query) use ($programId) {
+        $currentDate = Carbon::now();
+    
+        $books = RequestedBooks::where('program_name', $programId)->get();
+        
+        $approvedBooks = RequestedBooks::where('status', 'Approved')
+        ->where('program_name', $programId)->get();
+
+        $pendingBooks = RequestedBooks::whereIn('status', ['Verified', 'Selected'])
+        ->where('program_name', $programId)->get();
+
+        $prescribedYears = range($currentDate->copy()->subYears(4)->year, $currentDate->year);
+            $requestedBooksByYear = RequestedBooks::join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('books.year, COUNT(requested_books.id) as title_count')
+            ->whereIn('books.year', $prescribedYears) // Filter by the last 4 years
+            ->where('requested_books.status', 'Approved')
+            ->where('requested_books.program_name', $programId)
+            ->groupBy('books.year')
+            ->orderBy('books.year', 'asc')
+            ->get();
+            $resultArray = [];
+
+            // Initialize the array with all years and set title count to 0
+            foreach ($prescribedYears as $year) {
+                $resultArray[$year] = 0;
+            }
+
+            // Fill in the actual title counts for existing years
+            foreach ($requestedBooksByYear as $result) {
+                $year = $result->year;
+                $resultArray[$year] = $result->title_count;
+            }
+
+        return view('faculty.index', compact('books', 'approvedBooks', 'pendingBooks', 'prescribedYears', 'resultArray'));
+    }
+    public function facultyBookEvaluation()
+    {
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+
+        $books = Book::where(function ($query) use ($programId) {
             $query->whereNull('program_hidden')
                 ->orWhereJsonDoesntContain('program_hidden', $programId);
+        })
+        ->where(function ($query) use ($programId) {
+            $query->whereNull('availabilty_program')
+                ->orWhereJsonDoesntContain('availabilty_program', $programId);
         })
         ->where(function ($query) use ($programId) {
             $query->whereNull('program_hide_request')
                 ->orWhereJsonDoesntContain('program_hide_request', $programId);
         })
-        ->get();    
+        ->get();
+    
     
         $courses = Course::whereHas('program', function ($query) use ($programId) {
             $query->where('assigned_program', $programId);
         })->get();
 
-        return view('faculty.index', compact('books', 'courses'));
+        return view('faculty.book-evaluation', compact('books', 'courses'));
     }
 
     public function updateProgramHideRequest($id)
@@ -368,22 +464,29 @@ class BookController extends Controller
     
     
 
-    public function listBooksApproval()
+    public function listBooksApproval($param)
     {
-        $user = Auth::user();
-        $programId = $user->assigned_program;
+        $programId = $param;
 
-        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
-            $query->where('assigned_program', $programId);
-        })->get();
-
-        $books = Book::available()->get();
+        $books = Book::where(function ($query) use ($programId) {
+            $query->whereNull('program_hidden')
+                ->orWhereJsonDoesntContain('program_hidden', $programId);
+        })
+        ->where(function ($query) use ($programId) {
+            $query->whereNull('availabilty_program')
+                ->orWhereJsonDoesntContain('availabilty_program', $programId);
+        })
+        ->where(function ($query) use ($programId) {
+            $query->whereNull('program_hide_request')
+                ->orWhereJsonDoesntContain('program_hide_request', $programId);
+        })
+        ->get();
 
         $courses = Course::whereHas('program', function ($query) use ($programId) {
             $query->where('assigned_program', $programId);
         })->get();
 
-        return view('librarian.book_list_approval', compact('books', 'requestedBooks', 'courses'));
+        return view('librarian.book_list_approval', compact('books', 'courses', 'programId'));
     }
 
     public function allBooks()
@@ -406,20 +509,87 @@ class BookController extends Controller
         })->get();
         return view('others.allUsers.pending', compact('requestedBooks', 'courses'));
     }
+
+    public function libPendingBooks()
+    {   
+        $user = Auth::user();
+        
+        $programId = $user->assigned_program;
+    
+        $requestedBooks = RequestedBooks::whereHas('faculty', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->whereIn('status', ['Selected', 'Verified'])->get();
+
+        $courses = Course::whereHas('program', function ($query) use ($programId) {
+            $query->where('assigned_program', $programId);
+        })->get();
+        return view('others.allUsers.pending', compact('requestedBooks', 'courses'));
+    }
     
     public function librarianIndex()
     {   
         $user = Auth::user();
-        $programId = $user->assigned_program;
-    
-        $requestedBooks = RequestedBooks::where('program_name', $programId)
-                                        ->whereIn('status', ['Selected', 'Verified'])
-                                        ->get();
-        
-        $book = Book::all();
-        $programs = Program::all();
+        $programId = $user->assigned_department;
+        $programs = Program::where('department', $programId)->orderBy('name')->pluck('name')
+        ->all();
 
-        return view('librarian.index', compact('requestedBooks', 'book', 'programs'));
+        $programCounts = [];
+
+        foreach ($programs as $program) {
+            $count = RequestedBooks::where('status', 'Approved')
+                ->where('program_name', $program)
+                ->count();
+
+            $programCounts[$program] = $count;
+        }
+
+        $totalNotedBooks = RequestedBooks::where('status', 'Approved')
+        ->whereIn('program_name', $programs)
+        ->count();
+
+        $totalPendingBooks = RequestedBooks::whereIn('status', ['Selected', 'Verified'])
+        ->whereIn('program_name', $programs)
+        ->count();
+
+        $activeCollection = RequestedBooks::whereIn('program_name', $programs)
+        ->join('books', 'requested_books.book_id', '=', 'books.id')
+        ->selectRaw('books.*')
+        ->where('status', 'Selected')
+            ->get();
+
+            foreach ($activeCollection as $resultss) {
+            $resultss->year;
+            }
+
+        $activeCollections = $activeCollection->where('year', '>=', date('Y') - 5)->count();
+
+        $user = Auth::user();
+        $programId = $user->assigned_program;
+
+        $currentDate = Carbon::now();
+    
+
+        $pendingBooks = RequestedBooks::whereIn('status', ['Verified', 'Selected'])
+        ->where('program_name', $programId)->get();
+
+
+
+
+        return view('librarian.index', compact('activeCollections', 'totalPendingBooks', 'totalNotedBooks', 'pendingBooks', 'programs', 'programCounts'));
+    }
+    public function librarianBookEvaluation()
+    {   
+        $user = Auth::user();
+        $programId = $user->assigned_department;
+        $programs = Program::where('department', $programId)->get();
+
+        $requestedBooks = RequestedBooks::whereIn('program_name', $programs->pluck('name'))
+        ->whereIn('status', ['Verified', 'Selected'])
+        ->get();
+
+        $book = Book::all();
+
+        return view('librarian.book-evaluation', compact('requestedBooks', 'book', 'programs'));
     }
 
     public function approvedBooks()
@@ -450,7 +620,65 @@ class BookController extends Controller
         // Return the view 'others.allUsers.approvedBooks' with the data 'requestedBooks', 'user', and 'courses'
         return view('others.allUsers.approvedBooks', compact('requestedBooks', 'user', 'courses'));
     }
+    public function librarianApprovedBooks(Request $request)
+    {   
+        $programName = $request->input('param');
     
+        // Query the requested books that belong to the same program name and have a status of 'Approved'
+        $requestedBooks = RequestedBooks::where(function ($query) use ($programName) {
+            $query->whereHas('program', function ($query) use ($programName) {
+                $query->where('name', $programName);
+            })->orWhere(function ($query) use ($programName) {
+                $query->whereNull('fac_id')
+                      ->whereHas('programChair', function ($query) use ($programName) {
+                          $query->where('assigned_program', $programName);
+                      });
+            });
+        })->where('status', 'Approved')->get();
+        
+        $groupedBooksss = RequestedBooks::where('program_name', $programName)
+        ->where('status', 'Approved')
+        ->join('courses', 'requested_books.course_id', '=', 'courses.course_code')
+        ->join('books', 'requested_books.book_id', '=', 'books.id')
+        ->selectRaw('courses.*, books.*, requested_books.*, requested_books.id as requested_book_id')
+        ->get();
+
+
+        $organizeBook = $groupedBooksss
+        ->groupBy('course_title');
+            // dd($organizeBook);   
+        // Get all courses (assuming 'Course' is an Eloquent model)
+        $courses = Course::whereHas('program', function ($query) use ($programName) {
+            $query->where('assigned_program', $programName);
+        })->get();
+    
+        // Return the view 'others.allUsers.approvedBooks' with the data 'requestedBooks', 'user', and 'courses'
+        return view('others.allUsers.approvedBooks', compact('requestedBooks', 'courses', 'organizeBook', 'programName'));
+    }
+    public function exportBooks(Request $request)
+    {   
+        $programName = $request->input('param');
+        $pageSize = $request->input('page_size', 'a3');
+        $orientation = $request->input('orientation', 'portrait');
+
+        $groupedBooksss = RequestedBooks::where('program_name', $programName)
+        ->where('status', 'Approved')
+        ->join('courses', 'requested_books.course_id', '=', 'courses.course_code')
+        ->join('books', 'requested_books.book_id', '=', 'books.id')
+        ->selectRaw('courses.*, books.*, requested_books.*, requested_books.id as requested_book_id')
+        ->get();
+
+
+        $organizeBook = $groupedBooksss
+        ->groupBy('course_title');
+
+                    // Load the PDF view and generate the PDF
+        $pdf = PDF::loadView('others.export.notedBookExport', compact('programName','organizeBook', 'pageSize', 'orientation'))->setPaper($pageSize, $orientation);
+        
+                    // Return the PDF for download
+         return $pdf->stream('Noted_Books.pdf', ['Content-Type' => 'application/pdf']);
+    }
+
     public function rejectedBooks()
     {   
         $user = Auth::user();
@@ -474,39 +702,67 @@ class BookController extends Controller
     
         return redirect()->back();
     }
-
-    public function denyBook($id)
+    public function libRefuseBookRequest(RequestedBooks $requestedBook)
     {
-        $status = RequestedBooks::find($id);
 
-        $status->status='Denied';
+        $book = $requestedBook->book;
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
 
-        $status->save();
+        // Get the program code for the current faculty
+        $ProgramCode = $requestedBook->program_name;
 
-        return redirect()->back();
+        // Check if the faculty program is in the current programs
+        if (in_array($ProgramCode, $currentPrograms)) {
+            // Remove the program from the array
+            $currentPrograms = array_values(array_diff($currentPrograms, [$ProgramCode]));
+
+            // Update the book's availability_program attribute
+            $book->availabilty_program = json_encode($currentPrograms);
+            $book->save();
+        }
+    
+        // Delete the book request
+        $requestedBook->delete();
+
+
+        // $usersWithSameProgram = User::where('assigned_program', $ProgramCode)->get();
+        // foreach ($usersWithSameProgram as $user) {
+        //     $user->notify(new BookRejectedNotification($requestedBook));
+        // }
+
+        return redirect()->back()->with('checked', 'Book request has been refued successfully');
 
     }
 
-    public function rejectBook($id)
+    public function PCrefuseBookRequest(RequestedBooks $requestedBook)
     {
 
+        $book = $requestedBook->book;
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
+
+        // Get the program code for the current faculty
         $ProgramCode = Auth::user()->assigned_program;
-        $libId = Auth::id();
 
-        $requestedBooks = RequestedBooks::with('book')->find($id);
-        $requestedBooks->book->update(['availability' => true]);
-        $requestedBooks->status='Rejected';
-        $requestedBooks->lib_id = $libId;
+        // Check if the faculty program is in the current programs
+        if (in_array($ProgramCode, $currentPrograms)) {
+            // Remove the program from the array
+            $currentPrograms = array_values(array_diff($currentPrograms, [$ProgramCode]));
 
-        $requestedBooks->save();
-
-
-        $usersWithSameProgram = User::where('assigned_program', $ProgramCode)->get();
-        foreach ($usersWithSameProgram as $user) {
-            $user->notify(new BookRejectedNotification($requestedBooks));
+            // Update the book's availability_program attribute
+            $book->availabilty_program = json_encode($currentPrograms);
+            $book->save();
         }
+    
+        // Delete the book request
+        $requestedBook->delete();
 
-        return redirect()->back()->with('reject', 'Book request has been rejected successfully');
+
+        // $usersWithSameProgram = User::where('assigned_program', $ProgramCode)->get();
+        // foreach ($usersWithSameProgram as $user) {
+        //     $user->notify(new BookRejectedNotification($requestedBook));
+        // }
+
+        return redirect()->back()->with('checked', 'Book request has been refued successfully');
 
     }
 
@@ -527,18 +783,31 @@ class BookController extends Controller
     public function selectBook(Request $request, $id)
     {   
         $courseCode = $request->input('course_code');
+        
+        $book = Book::find($id);
 
+        // Check if the book exists
+        if (!$book) {
+            return redirect()->back()->with('error', 'Book not found.');
+        }
+
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
         if (empty($courseCode)) {
             return redirect()->back()->with('error', 'Course code is required.');
         }
         $facId = Auth::id();
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
     
         // Get the program code for the current faculty
         $facultyProgramCode = Auth::user()->assigned_program;
-
-        $selectedBook = Book::find($id);
+        
+        if (!in_array($facultyProgramCode, $currentPrograms)) {
+            $currentPrograms[] = $facultyProgramCode;
     
-       // Get the year of the selected book
+            // Update the book's availability_program attribute
+            $book->availabilty_program = json_encode($currentPrograms);
+            $book->save();
+        }
 
     
         // Create a new entry in the RequestedBooks table
@@ -551,12 +820,6 @@ class BookController extends Controller
 
     
         $requestedBook->save();
-
-        $selectedBook = Book::find($id);
-        if ($selectedBook) {
-            $selectedBook->availability = false;
-            $selectedBook->save();
-        }
     
         // Notify users with the same assigned_program
         $usersWithSameProgram = User::where('assigned_program', $facultyProgramCode)->get();
@@ -564,17 +827,31 @@ class BookController extends Controller
             $user->notify(new BookSelectNotification($requestedBook));
         }
     
-        return redirect()->back()->with('success', 'Book has been selected successfully.');
+        return redirect()->back()->with('checked', 'Book has been selected successfully.');
     }    
     
-    public function autoApprovedBook(Request $request, $id)
+    public function autoApprovedBook(Request $request, $id) 
     {
         $courseCode = $request->input('course_code');
-        $librarianId = Auth::id();
+        $libId = Auth::id();
+        $book = Book::find($id);
+        $ProgramCode = $request->input('param');
+        
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
+        if (empty($courseCode)) {
+            return redirect()->back()->with('error', 'Course code is required.');
+        }
+        $currentPrograms = json_decode($book->availabilty_program) ?? [];
     
-        // Get the program code for the current faculty
-        $ProgramCode = Auth::user()->assigned_program;
+        
+        if (!in_array($ProgramCode, $currentPrograms)) {
+            $currentPrograms[] = $ProgramCode;
     
+            // Update the book's availability_program attribute
+            $book->availabilty_program = json_encode($currentPrograms);
+            $book->save();
+        }
+        
         // Check if a requested book with the same book_id, course_id, and program_code exists for the authenticated faculty.
         $existingRequestedBook = RequestedBooks::where('book_id', $id)
             ->where('course_id', $courseCode)
@@ -590,18 +867,13 @@ class BookController extends Controller
         $requestedBook = new RequestedBooks();
         $requestedBook->book_id = $id;
         $requestedBook->course_id = $courseCode;
-        $requestedBook->lib_id = $librarianId;
+        $requestedBook->lib_id = $libId;
         $requestedBook->status = 'Approved';
         $requestedBook->program_name = $ProgramCode;
         $requestedBook->approved_at = now();
     
         $requestedBook->save();
 
-        $selectedBook = Book::find($id);
-        if ($selectedBook) {
-            $selectedBook->availability = false;
-            $selectedBook->save();
-        }
     
         // Notify users with the same assigned_program
         $usersWithSameProgram = User::where('assigned_program', $ProgramCode)->get();
@@ -609,7 +881,7 @@ class BookController extends Controller
             $user->notify(new BookApprovalNotification($requestedBook));
         }
     
-        return redirect()->back()->with('success', 'Book has been approved successfully.');
+        return redirect()->back()->with('checked', 'Book has been approved successfully');
     } 
 
     public function verified($id)
@@ -632,7 +904,7 @@ class BookController extends Controller
         }
     
         // Return a response or redirect as needed
-        return redirect()->back()->with('success', 'Book request verified successfully');
+        return redirect()->back()->with('checked', 'Book request verified successfully');
     }
     
 
@@ -666,149 +938,19 @@ class BookController extends Controller
     // // Mail::to('mackieodavar42@gmail.com')->send(new BookApprovalMail($bookTracking));
 
     //     $user->notify(new BookApprovalNotification($bookTracking));
-   
-    public function reportIndex(){
-        $currentDate = Carbon::now();
-        $nineYearsAgo = $currentDate->copy()->subYears(9);
-        $eightYearsAgo = $currentDate->copy()->subYears(8);
-        $sevenYearsAgo = $currentDate->copy()->subYears(7);
-        $sixYearsAgo = $currentDate->copy()->subYears(6);
-        $fiveYearsAgo = $currentDate->copy()->subYears(5);
-        $fourYearsAgo = $currentDate->copy()->subYears(4);
-        $threeYearsAgo = $currentDate->copy()->subYears(3);
-        $twoYearsAgo = $currentDate->copy()->subYears(2);
-        $oneYearsAgo = $currentDate->copy()->subYears(1);
-    
-        // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
-        //     ->groupBy('year', 'course_id')
-        //     ->orderBy('year', 'asc')
-        //     ->orderBy('course_id', 'asc')
-        //     ->with('course')
-        //     ->get();
-        
-        $ProgramCode = 'BSIT';
-        $books = RequestedBooks::where('program_name', 'BSIT')
-        ->join('books', 'requested_books.book_id', '=', 'books.id')
-        ->selectRaw('books.year, requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
-        ->groupBy('books.year', 'requested_books.course_id')
-        ->orderBy('books.year', 'asc')
-        ->orderBy('requested_books.course_id', 'asc')
-        ->with('course')
-        ->get();
-        
-        $groupedBooks = $books->groupBy('course_id')->map(function ($courseGroup) {
-            return $courseGroup->groupBy('year');
-        });
-        
 
-        $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
-
-        $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year];
-
-        return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'));
-    }
-    
-    
-    public function reports(){
-        $currentDate = Carbon::now();
-        $nineYearsAgo = $currentDate->copy()->subYears(9);
-        $eightYearsAgo = $currentDate->copy()->subYears(8);
-        $sevenYearsAgo = $currentDate->copy()->subYears(7);
-        $sixYearsAgo = $currentDate->copy()->subYears(6);
-        $fiveYearsAgo = $currentDate->copy()->subYears(5);
-        $fourYearsAgo = $currentDate->copy()->subYears(4);
-        $threeYearsAgo = $currentDate->copy()->subYears(3);
-        $twoYearsAgo = $currentDate->copy()->subYears(2);
-        $oneYearsAgo = $currentDate->copy()->subYears(1);
-    
-        // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
-        //     ->groupBy('year', 'course_id')
-        //     ->orderBy('year', 'asc')
-        //     ->orderBy('course_id', 'asc')
-        //     ->with('course')
-        //     ->get();
-        $ProgramCode = Auth::user()->assigned_program;
-        $books = RequestedBooks::where('program_name', $ProgramCode)
-        ->join('books', 'requested_books.book_id', '=', 'books.id')
-        ->selectRaw('books.year, requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
-        ->groupBy('books.year', 'requested_books.course_id')
-        ->orderBy('books.year', 'asc')
-        ->orderBy('requested_books.course_id', 'asc')
-        ->with('course')
-        ->get();
-        
-        $groupedBooks = $books->groupBy('course_id')->map(function ($courseGroup) {
-            return $courseGroup->groupBy('year');
-        });
-        
-
-        $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
-
-        $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year];
-
-        return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'));
-    }
-        public function exportPdfss()
-        {
-            $currentDate = Carbon::now();
-            $nextYear = $currentDate->addYear();
-            $nineYearsAgo = $currentDate->copy()->subYears(9);
-            $eightYearsAgo = $currentDate->copy()->subYears(8);
-            $sevenYearsAgo = $currentDate->copy()->subYears(7);
-            $sixYearsAgo = $currentDate->copy()->subYears(6);
-            $fiveYearsAgo = $currentDate->copy()->subYears(5);
-            $fourYearsAgo = $currentDate->copy()->subYears(4);
-            $threeYearsAgo = $currentDate->copy()->subYears(3);
-            $twoYearsAgo = $currentDate->copy()->subYears(2);
-            $oneYearsAgo = $currentDate->copy()->subYears(1);
-
-            
-        
-            // Fetch the data as you did before
-            $ProgramCode = Auth::user()->assigned_program;
-            $books = RequestedBooks::where('program_name', $ProgramCode)
-                ->join('books', 'requested_books.book_id', '=', 'books.id')
-                ->selectRaw('books.year, requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
-                ->groupBy('books.year', 'requested_books.course_id')
-                ->orderBy('books.year', 'asc')
-                ->orderBy('requested_books.course_id', 'asc')
-                ->with('course')
-                ->get();
-        
-            $groupedBooks = $books->groupBy('course_id')->map(function ($courseGroup) {
-                return $courseGroup->groupBy('year');
-            });
-        
-            $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
-            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year];
-            
-            // Load the PDF view and generate the PDF
-            $pdf = PDF::loadView('pdfs', compact('books', 'groupedBooks', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'))->setPaper('a3', 'landscape');
-            
-            // Return the PDF for download
-            return $pdf->download('collection_report.pdf');
-        }
-
-        public function pdf()
+        public function report()
         {
             $currentDate = Carbon::now();
             $nextYear = $currentDate->copy()->addYear();
-            $nineYearsAgo = $currentDate->copy()->subYears(9);
-            $eightYearsAgo = $currentDate->copy()->subYears(8);
-            $sevenYearsAgo = $currentDate->copy()->subYears(7);
-            $sixYearsAgo = $currentDate->copy()->subYears(6);
             $fiveYearsAgo = $currentDate->copy()->subYears(5);
             $fourYearsAgo = $currentDate->copy()->subYears(4);
             $threeYearsAgo = $currentDate->copy()->subYears(3);
             $twoYearsAgo = $currentDate->copy()->subYears(2);
             $oneYearsAgo = $currentDate->copy()->subYears(1);
-        
-            // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
-            //     ->groupBy('year', 'course_id')
-            //     ->orderBy('year', 'asc')
-            //     ->orderBy('course_id', 'asc')
-            //     ->with('course')
-            //     ->get();
+            $fiveYearsBelow = range(1990, $currentDate->copy()->subYears(5)->year);
+            
+
             $ProgramCode = 'BSIT';
             $books = RequestedBooks::where('program_name', $ProgramCode)
             ->where('status', 'Approved')
@@ -824,13 +966,92 @@ class BookController extends Controller
 
             $courseGroupsssBooksTitle = $books
             ->groupBy('course.course_group');
+    
+            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
 
+            return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
+        }
+        public function librarianReport(Request $request)
+        {   
+            $param = $request->input('param');
+            $currentDate = Carbon::now();
+            $nextYear = $currentDate->copy()->addYear();
+            $fiveYearsAgo = $currentDate->copy()->subYears(5);
+            $fourYearsAgo = $currentDate->copy()->subYears(4);
+            $threeYearsAgo = $currentDate->copy()->subYears(3);
+            $twoYearsAgo = $currentDate->copy()->subYears(2);
+            $oneYearsAgo = $currentDate->copy()->subYears(1);
+            $fiveYearsBelow = range(1985, $currentDate->copy()->subYears(5)->year);
+            
+
+            $ProgramCode = $param;
+            $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
+            ->select('requested_books.*', 'programs.minimum_req')
+            ->pluck('minimum_req')->first();
+            
+            $books = RequestedBooks::where('program_name', $ProgramCode)
+            ->where('status', 'Approved')
+            ->join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles, books.year as book_year')
+            ->groupBy('requested_books.course_id', 'books.year')
+            ->orderBy('requested_books.course_id', 'asc')
+            ->with('course')
+            ->get();
+
+            $groupedBooks = $books
+            ->groupBy('course_id');
+            // $groupedBooks = $books
+            // ->join('books', 'requested_books.book_id', '=', 'books.title');
+
+            $courseGroupsssBooksTitle = $books
+            ->groupBy('course.course_group');
+    
+            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
+            
+            return view('admin.CollectionProfile.collection', compact('minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'param', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
+        }
+        public function ProgramChairreport()
+        {
+            $currentDate = Carbon::now();
+            $nextYear = $currentDate->copy()->addYear();
+            $nineYearsAgo = $currentDate->copy()->subYears(9);
+            $eightYearsAgo = $currentDate->copy()->subYears(8);
+            $sevenYearsAgo = $currentDate->copy()->subYears(7);
+            $sixYearsAgo = $currentDate->copy()->subYears(6);
+            $fiveYearsAgo = $currentDate->copy()->subYears(5);
+            $fourYearsAgo = $currentDate->copy()->subYears(4);
+            $threeYearsAgo = $currentDate->copy()->subYears(3);
+            $twoYearsAgo = $currentDate->copy()->subYears(2);
+            $oneYearsAgo = $currentDate->copy()->subYears(1);
+            
+            $ProgramCode = Auth::user()->assigned_program;
+            $books = RequestedBooks::where('program_name', $ProgramCode)
+            ->where('status', 'Approved')
+            ->join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles, books.year as book_year')
+            ->groupBy('requested_books.course_id', 'books.year')
+            ->orderBy('requested_books.course_id', 'asc')
+            ->with('course')
+            ->get();
+            
+            $groupedBooks = $books
+            ->groupBy('course_id');
+
+            $courseGroupsssBooksTitle = $books
+            ->groupBy('course.course_group');
+
+            $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
+            ->select('requested_books.*', 'programs.minimum_req')
+            ->pluck('minimum_req')->first();
+            
+    
             $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
     
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
     
-            return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
+            return view('programChair.reports', compact('minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
         }
+        
         public function pgPdf()
         {
             $currentDate = Carbon::now();
@@ -873,31 +1094,24 @@ class BookController extends Controller
             return view('programChair.reports', compact('books', 'groupedBooks', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
         }
 
+        
+
         public function exportPdf(Request $request)
-        {   
+        {
+            $param = $request->input('param');
             $currentDate = Carbon::now();
             $nextYear = $currentDate->copy()->addYear();
-            $nineYearsAgo = $currentDate->copy()->subYears(9);
-            $eightYearsAgo = $currentDate->copy()->subYears(8);
-            $sevenYearsAgo = $currentDate->copy()->subYears(7);
-            $sixYearsAgo = $currentDate->copy()->subYears(6);
             $fiveYearsAgo = $currentDate->copy()->subYears(5);
             $fourYearsAgo = $currentDate->copy()->subYears(4);
             $threeYearsAgo = $currentDate->copy()->subYears(3);
             $twoYearsAgo = $currentDate->copy()->subYears(2);
             $oneYearsAgo = $currentDate->copy()->subYears(1);
-            
+            $fiveYearsBelow = range(1990, $currentDate->copy()->subYears(5)->year);
+
             $pageSize = $request->input('page_size', 'a3');
             $orientation = $request->input('orientation', 'portrait');
-            $ProgramCode = 'BSIT';
+            $ProgramCode = $param;
         
-            // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
-            //     ->groupBy('year', 'course_id')
-            //     ->orderBy('year', 'asc')
-            //     ->orderBy('course_id', 'asc')
-            //     ->with('course')
-            //     ->get();
-            $ProgramCode = Auth::user()->assigned_program;
             $books = RequestedBooks::where('program_name', $ProgramCode)
             ->where('status', 'Approved')
             ->join('books', 'requested_books.book_id', '=', 'books.id')
@@ -906,68 +1120,31 @@ class BookController extends Controller
             ->orderBy('requested_books.course_id', 'asc')
             ->with('course')
             ->get();
+
+            $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
+            ->select('requested_books.*', 'programs.minimum_req')
+            ->pluck('minimum_req')->first();
             
             $groupedBooks = $books
             ->groupBy('course_id');
+ 
+            $total = RequestedBooks::where('program_name', $ProgramCode)
+            ->where('status', 'Approved')
+            ->join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
+            ->first();
 
             $courseGroupsssBooksTitle = $books
             ->groupBy('course.course_group');
             
-            $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
 
             // Load the PDF view and generate the PDF
-            $pdf = PDF::loadView('pdfs', compact('books', 'groupedBooks','courseGroupsssBooksTitle', 'pageSize', 'orientation','nextYear', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'))->setPaper($pageSize, $orientation);
+            $pdf = PDF::loadView('pdfs', compact( 'total','minimumreq', 'books', 'groupedBooks','courseGroupsssBooksTitle', 'pageSize', 'orientation','nextYear', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'))->setPaper($pageSize, $orientation);
         
             // Return the PDF for download
             return $pdf->stream('collection_report.pdf', ['Content-Type' => 'application/pdf']);
         }
-
-        // public function pdf()
-        // {
-        //     $currentDate = Carbon::now();
-        //     $nextYear = $currentDate->copy()->addYear();
-        //     $nineYearsAgo = $currentDate->copy()->subYears(9);
-        //     $eightYearsAgo = $currentDate->copy()->subYears(8);
-        //     $sevenYearsAgo = $currentDate->copy()->subYears(7);
-        //     $sixYearsAgo = $currentDate->copy()->subYears(6);
-        //     $fiveYearsAgo = $currentDate->copy()->subYears(5);
-        //     $fourYearsAgo = $currentDate->copy()->subYears(4);
-        //     $threeYearsAgo = $currentDate->copy()->subYears(3);
-        //     $twoYearsAgo = $currentDate->copy()->subYears(2);
-        //     $oneYearsAgo = $currentDate->copy()->subYears(1);
-        
-        //     // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
-        //     //     ->groupBy('year', 'course_id')
-        //     //     ->orderBy('year', 'asc')
-        //     //     ->orderBy('course_id', 'asc')
-        //     //     ->with('course')
-        //     //     ->get();
-        //     $ProgramCode = 'BSIT';
-        //     // $books = RequestedBooks::all();
-
-        //     $books = RequestedBooks::where('program_name', $ProgramCode)
-        //     ->join('books', 'requested_books.book_id', '=', 'books.id')
-        //     ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
-        //     ->groupBy('requested_books.course_id')
-        //     ->with('course', 'book')
-        //     ->get();    
-        
-            
-        //         $groupedBooks = $books->groupBy('course_id');
-
-
-                
-
-                
-           
-    
-        //     $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
-    
-        //     $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
-    
-        //     return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
-        // }
         
         public function cancelVerifyBook($id)
         {
@@ -984,7 +1161,7 @@ class BookController extends Controller
             $bookTracking->save();
         
             // Return a response or redirect as needed
-            return redirect()->back()->with('success', 'Book request approved successfully');
+            return redirect()->back()->with('success', 'Book has been evaluation process again');
         }
 }
 

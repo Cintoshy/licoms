@@ -25,13 +25,18 @@
                     <input type="text" class="form-control form-control-user" id="description" name="description"
                         value="{{ $program->description }}"required>
                 </div>
-                <div class="col-sm-6 mb-3 mb-sm-0">
+                <div class="col-sm-6 my-3 mb-sm-0">
                     <h6> Department</h6>
                     <select class="form-control form-control-user" id="department" name="department" required>
                     @foreach ($departments as $department)
                         <option value="{{ $department->department_name }}" {{ $department->department_name == $department->department_name ? 'selected' : '' }}>{{ $department->department_name }}</option>
                     @endforeach
                                 </select>
+                </div>
+                <div class="col-sm-6 my-3 mb-sm-0">
+                    <h6> Minimimum Req</h6>
+                    <input type="number" class="form-control form-control-user" id="minimum_req" name="minimum_req"
+                        value="{{ $program->minimum_req }}" min="1" max="10" required>
                 </div>
 
             </div>

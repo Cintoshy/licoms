@@ -39,6 +39,10 @@ Route::get('/', function () {
 });
 
 //Auth//
+Route::get('/profile', function () {
+    return view('profile');
+});
+
     
 
     Route::get('licoms', [GoogleController::class, 'index'])->name('licoms');
@@ -64,16 +68,15 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->middleware(['auth', 'admin', 'cache'])->group(function () {
 
 
-    Route::get('/dashboard',[IndexController::class, 'index'])->name('admin.dashboard');
+        Route::get('/dashboard',[IndexController::class, 'index'])->name('admin.dashboard');
 
     // Summary of Records
     Route::get('/summaryRecords', [SOR_Controller::class, 'index'])->name('admin.SOR.index');
     Route::get('/Summary-of-Recods', [SOR_Controller::class, 'summaryRecords'])->name('admin.SOR.summaryRecords');
 
     // CollectionProfile
-    Route::get('/collectionProfile', [BookController::class, 'pdf'])->name('admin.CollectionProfile.index');
+    Route::get('/collectionProfile', [BookController::class, 'report'])->name('admin.CollectionProfile.index');
     Route::get('/listOfDepartments', [CollectionProfileController::class, 'listDepartments'])->name('admin.listDepartments.index');
-    Route::get('/sample', [BookController::class, 'reportIndexxx'])->name('admin.indexxx');
 
 
     // Course Group
@@ -140,44 +143,48 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'cache'])->group(function (
 
 // Program-Chair Routes
 Route::prefix('programChair')->middleware(['auth', 'programchair', 'cache'])->group(function () {
+    Route::get('/dashboard', [BookController::class, 'pcIndex'])->name('program-chair.index');
+    Route::get('/bookEvaulation', [BookController::class, 'pcBookEvaluation'])->name('program-chair.book-evaluation');
     Route::get('/hideRequest', [BookController::class, 'ProgramHideRequest'])->name('pg.hideRequest');
     Route::put('/books/{id}', [BookController::class, 'acceptHideRequest'])->name('pg.acceptHideRequest');
     Route::get('/refuseHideRequest{id}', [BookController::class, 'RefuseHideRequest'])->name('pg.RefuseHideRequest');
-    Route::get('/dashboard', [BookController::class, 'pgIndex'])->name('program-chair.index');
-    Route::get('/collectionProfile', [BookController::class, 'pgPdf'])->name('pg.reports');
+    Route::get('/collectionProfile', [BookController::class, 'ProgramChairreport'])->name('pg.reports');
     Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('pg-books.show');
-    Route::put('/updateStatus/{id}', [BookController::class, 'verified'])->name('pg-books.verified-status');
     Route::put('/pg-books/{id}/change-status', [BookController::class, 'changeStatus'])->name('pg-books.change-status');
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('pg.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('pg.pendingBooks');
     Route::get('/requestBookss', [BookController::class, 'index'])->name('fac.request');
     Route::get('/activityLogs', [ActivityLog::class, 'pgActivityLog'])->name('pgActivityLogs');
+    Route::put('/updateStatus/{id}', [BookController::class, 'verified'])->name('pg-books.verified-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelVerifyBook'])->name('pg-cancelVerified-status');
+    Route::delete('/rejectBook/{requestedBook}', [BookController::class, 'PCrefuseBookRequest'])->name('pg-books.refuse-status');
 });
 
 // Library Routes
 Route::prefix('librarian')->middleware(['auth', 'librarian', 'cache'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'librarianIndex'])->name('librarian.dashboard');
+    Route::get('/bookEvaluation', [BookController::class, 'librarianBookEvaluation'])->name('librarian.book-evaluation');
     Route::get('/Reports', [CollectionProfileController::class, 'index'])->name('lib-Reports');
-    Route::get('/collectionProfile', [BookController::class, 'pdf'])->name('lib-reports');
+    Route::get('/collectionProfile', [BookController::class, 'librarianReport'])->name('lib-reports');
     Route::get('/showBooks/{book}', [BookController::class, 'show'])->name('lib-books.show');
     Route::put('/books/{book}', [BookController::class, 'update'])->name('lib.books.update');
-    Route::get('/bookList', [BookController::class, 'listBooksApproval'])->name('lib-books-list');
-    Route::put('/updateStatus/{id}', [BookController::class, 'approveBook'])->name('lib-books.verified-status');
-    Route::post('/approved-book/{id}', [BookController::class, 'autoApprovedBook'])->name('lib-approve.book');
-    Route::put('/rejectBook/{id}', [BookController::class, 'rejectBook'])->name('lib-books.reject-status');
     Route::get('/books/{book}/edit', [BookController::class, 'libEdit'])->name('lib-books.edit');
     Route::put('/books/{book}', [BookController::class, 'libUpdate'])->name('lib-books.update');
-    Route::put('/denyStatus/{id}', [BookController::class, 'denyBook'])->name('lib-books.deny-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelGrant'])->name('lib-books.cancel-status');
-    Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('librarian.approvedBooks');
+    Route::get('/approvedBooks', [BookController::class, 'librarianApprovedBooks'])->name('librarian.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('lib.pendingBooks');
+    Route::post('/approved-bookss/{id}', [BookController::class, 'autoApprovedBook'])->name('lib-approve.book');
+    Route::get('/bookList/{param}', [BookController::class, 'listBooksApproval'])->name('lib-books-list');
+    Route::put('/updateStatus/{id}', [BookController::class, 'approveBook'])->name('lib-books.approve-status');
+    Route::delete('/rejectBook/{requestedBook}', [BookController::class, 'libRefuseBookRequest'])->name('lib-books.refuse-status');
+    Route::post('/export-booksNoted', [BookController::class, 'exportBooks'])->name('export-Books');
 
 });
 
 // Faculty Routes
 Route::prefix('faculty')->middleware(['auth', 'faculty', 'cache'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'facultyIndex'])->name('faculty.dashboard');
+    Route::get('/bookEvaluation', [BookController::class, 'facultyBookEvaluation'])->name('faculty.bookEvaluation');
     Route::get('/archivedBooks', [BookController::class, 'archivedBooks'])->name('fac.archivedBooks');
     Route::get('/cancelHideBook{id}', [BookController::class, 'RefuseHideRequest'])->name('fac.RefuseHideRequest');
     Route::get('/showBooksss/{book}', [BookController::class, 'show'])->name('fac-books.show');
@@ -188,6 +195,7 @@ Route::prefix('faculty')->middleware(['auth', 'faculty', 'cache'])->group(functi
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('fac.pendingBooks');
     Route::delete('/books/{requestedBook}', [BookController::class, 'cancelSelectedBook'])->name('fac.cancelSelectedBook');
     Route::get('/activityLogs', [ActivityLog::class, 'index'])->name('activityLogs');
+
     
 
 });

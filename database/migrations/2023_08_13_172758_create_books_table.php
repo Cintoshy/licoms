@@ -18,7 +18,7 @@ class CreateBooksTable extends Migration
             $table->json('access_no')->nullable();
             $table->integer('year');
             $table->string('publish');
-            $table->boolean('availability')->default(true);
+            $table->json('availabilty_program')->nullable();
             $table->json('program_hide_request')->nullable();
             $table->json('program_hidden')->nullable();
             $table->timestamps();

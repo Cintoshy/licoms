@@ -3,12 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Program;
 
 class CollectionProfileController extends Controller
 {
     public function index()
-    {
-        return view('admin.CollectionProfile.collection');
+    {   
+        $user = Auth::user();
+        $assignedDepartment = $user->assigned_department;
+
+        $programs = Program::where('department', $assignedDepartment)->get();   
+        return view('librarian.listProgramsReport', compact('programs'));
+    }
+    public function librarianApprovedBook()
+    {   
+        $user = Auth::user();
+        $assignedDepartment = $user->assigned_department;
+
+        $programs = Program::where('department', $assignedDepartment)->get();   
+        return view('librarian.listProgramsApproved', compact('programs'));
+    }
+    public function librarianPendingBook()
+    {   
+        $user = Auth::user();
+        $assignedDepartment = $user->assigned_department;
+
+        $programs = Program::where('department', $assignedDepartment)->get();   
+        return view('librarian.listProgramsPending', compact('programs'));
     }
     public function listDepartments()
     {   

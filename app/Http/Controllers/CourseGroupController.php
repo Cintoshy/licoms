@@ -20,7 +20,7 @@ class CourseGroupController extends Controller
     {   
         $input = $request->all();
         CourseGroup::create($input);
-        return redirect('admin/courseGroups')->with('success', 'Course Group Addedd!');
+        return redirect('admin/courseGroups')->with('checked', 'Course Group Added');
     }
 
     public function edit(CourseGroup $courseGroup)

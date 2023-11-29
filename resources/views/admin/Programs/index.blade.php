@@ -27,6 +27,7 @@
                             <th>Program Name</th>
                             <th>Description</th>
                             <th>Department</th>
+                            <th width="13%">Minimum Req</th>
                             <th width="10%">Action</th>
                         </tr>
                     </thead>
@@ -37,14 +38,14 @@
                                 <td>{{ $program->name }}</td>
                                 <td>{{ $program->description }}</td>
                                 <td>{{ $program->department }}</td>
+                                <td>{{ $program->minimum_req }}</td>
                                 <td>
                                 <a class="btn btn-primary" onclick="openDeptEditBookModal('{{ route('admin.program.edit', $program) }}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <form action="{{ route('admin.program.destroy', $program) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash text-white"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-danger"data-toggle="modal" data-target="#deleteProgramModal{{$program->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.Programs.deleteProgramModal')
                                     </form>
 
                                 </td>

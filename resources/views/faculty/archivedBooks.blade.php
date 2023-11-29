@@ -29,7 +29,7 @@
                     <tbody>
                         @foreach($books as $book)
                             <tr >
-                                <td class="fw-bold">{{ $book->id }}</td>
+                                <td class="fw-bold">{{ $book->call_number }}</td>
                                 <td class="fw-bold">{{ $book->title }}</td>
                                 <td>{{ $book->author }}</td>
                                 <td>{{ $book->publish }}</td>

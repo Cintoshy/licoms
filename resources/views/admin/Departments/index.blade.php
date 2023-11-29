@@ -27,6 +27,7 @@
                             <th>#</th>
                             <th>Department Name</th>
                             <th>Description</th>
+                            <th>Logo</th>
                             <th width="10%">Action</th>
                         </tr>
                     </thead>
@@ -37,13 +38,20 @@
                                 <td>{{ $department->department_name }}</td>
                                 <td>{{ $department->description }}</td>
                                 <td>
+                                    @if ($department->logo)
+                                        <img src="{{ asset('storage/' . $department->logo) }}" alt="Department Logo" width="50">
+                                    @else
+                                        NONE
+                                    @endif
+                                </td>
+
+                                <td>
                                 <a class="btn btn-primary" onclick="openDeptEditBookModal('{{ route('admin.department.edit', $department) }}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <form action="{{ route('admin.department.destroy', $department) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash text-white"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteDepartmentModal{{$department->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.Departments.deleteDepartmentModal')
                                     </form>
 
                                 </td>
@@ -69,6 +77,5 @@
         </div>
     </div>
 </div>
-    
 
 @endsection

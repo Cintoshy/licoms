@@ -14,7 +14,7 @@
                         </tr>
                         <tr>
                             <th rowspan="3" colspan="2">Courses</th>
-                            <th>5 books per Course</th>
+                            <th>{{$minimumreq}} books per Course</th>
                         </tr>
                         <tr>
                             <th>TOTAL</th>
@@ -23,51 +23,57 @@
                     <tbody>
 
                     @php
+                        $courseCounts = [];
                         $previousCourseGroup = null;
-                        $courseCount = 0;
                         $totalCourseCount = 0;
-                    @endphp
+                        @endphp
 
-                    @foreach ($groupedBooks as $courseId => $courseGroup)
-                        @php
+                        @foreach ($groupedBooks as $courseId => $courseGroup)
+                            @php
                             $currentCourseGroup = $courseGroup[0]->course->course_group;
-                        @endphp
+                            @endphp
 
-                        @if ($currentCourseGroup !== $previousCourseGroup)
-                            @if ($previousCourseGroup !== null)
-                                <tr>
-                                    <td>{{ $previousCourseGroup }}</td>
-                                    <td>{{ $courseCount }}</td>
-                                    <td>{{ $courseCount * 5 }}</td>
-                                </tr>
-                            @endif
+                            @if ($currentCourseGroup !== $previousCourseGroup)
+                                @if ($previousCourseGroup !== null)
+                                    <tr>
+                                        <td>{{ $previousCourseGroup }}</td>
+                                        <td>{{ $courseCounts[$previousCourseGroup] }}</td>
+                                        <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
+                                    </tr>
+                                @endif
 
-                            @php
+                                @php
                                 $previousCourseGroup = $currentCourseGroup;
-                                $courseCount = 1; // Reset the course count for the new group
-                            @endphp
-                        @else
+                                if (!isset($courseCounts[$currentCourseGroup])) {
+                                    $courseCounts[$currentCourseGroup] = 1;
+                                } else {
+                                    $courseCounts[$currentCourseGroup]++;
+                                }
+                                @endphp
+                            @else
+                                @php
+                                $courseCounts[$currentCourseGroup]++;
+                                @endphp
+                            @endif
                             @php
-                                $courseCount++;
+                            $totalCourseCount++;
+                            $minimumTotal = $totalCourseCount;
                             @endphp
-                        @endif
-                        @php
-                            $totalCourseCount += $courseCount;
-                            $minimumTotal = $totalCourseCount - 1;
-                        @endphp
-                    @endforeach
+                        @endforeach
 
-                    {{-- After the loop, display the total count for the last group --}}
-                    <tr>
-                        <td>{{ $previousCourseGroup }}</td>
-                        <td>{{ $courseCount }}</td>
-                        <td>{{ $courseCount * 5 }}</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: right;"><strong>Grand Total:</strong></td>
-                        <td><strong>{{ $minimumTotal }}</strong></td>
-                        <td><strong>{{ $minimumTotal * 5 }}</strong></td>
-                    </tr>
+                        {{-- After the loop, display the total count for the last group --}}
+                        <tr>
+                            <td>{{ $previousCourseGroup }}</td>
+                            <td>{{ $courseCounts[$previousCourseGroup] ?? 0 }}</td>
+                            <td>{{ ($courseCounts[$previousCourseGroup] ?? 0) * $minimumreq }}</td>
+                        </tr>
+
+                        {{-- Display the grand total by adding up all course counts --}}
+                        <tr>
+                            <td style="text-align: right;"><strong>Grand Total:</strong></td>
+                            <td><strong>{{ $totalCourseCount }}</strong></td>
+                            <td><strong>{{ $totalCourseCount * $minimumreq }}</strong></td>
+                        </tr>
 
                     </tbody>
                     

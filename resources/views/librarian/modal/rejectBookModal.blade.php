@@ -8,13 +8,13 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                    Are you sure you want to reject this book <strong>{{$requestedBook->book->title}}?</strong>
+                                    Are you sure you want to refuse the request for this book <strong>{{$requestedBook->book->title}}?</strong>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="POST" class="m-0" action="{{ route('lib-books.reject-status', $requestedBook->id) }}">
+                                <form method="POST" class="m-0" action="{{ route('lib-books.refuse-status', $requestedBook->id) }}">
                                         @csrf
-                                        @method('PUT')
+                                        @method('delete')
                                         <button type="submit" class="btn btn-warning">Confirm</button>
                                 </form>
                             </div>

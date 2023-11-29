@@ -19,7 +19,7 @@
             <table id="body-table">
                 <thead>
                     <tr>
-                        <th colspan="2" rowspan="2">{{$books->first()->course->assigned_program ?? $ProgramCode}}</th>
+                        <th colspan="2" rowspan="2">{{$ProgramCode}}</th>
                         <th colspan="2"></th>
                         <th colspan="10">WITHIN PRESCRIBED 5 YEARS COPYRIGHT</th>
                         <th rowspan="2" colspan="2">Grand Total</th>
@@ -96,7 +96,6 @@
                                     @php
                                         $totalTitles += $book->total_titles;
                                         $totalVolumes += $book->total_volumes;
-                                        $totalVolumes += $book->total_volumes;
                                     @endphp
                                 @endif
                             @endforeach
@@ -105,13 +104,13 @@
                             @php
                                 $grandTotalTitles += $totalTitles;
                                 $grandTotalVolumes += $totalVolumes;
-                                $result = ($grandTotalTitles >= 5) ? 100 : ($grandTotalTitles * 20);
+                                $result = ($grandTotalTitles >= $minimumreq) ? 100 : ($grandTotalTitles * 20);
 
-                                $excessTitles = ($grandTotalTitles >= 5) ? ($grandTotalTitles - 5) : 0;
+                                $excessTitles = ($grandTotalTitles >= $minimumreq) ? ($grandTotalTitles - $minimumreq) : 0;
 
                                 if ($excessTitles > 0) {
                                     // Calculate the excessTitles percentage
-                                    $percentage = ($excessTitles <= 5) ? ($excessTitles * 20) : 100;
+                                    $percentage = ($excessTitles <= $minimumreq) ? ($excessTitles * 20) : 100;
                                 } else {
                                     $percentage = 0;
                                 }
@@ -126,22 +125,36 @@
                         $grandTotalresultPercentage = $TotalresultPercentage / $rowCount;
                         $totalAdditionalPercentage = $additionalPercentage / $rowCount;
 
-                        if ($grandTotalTitles >= 5) {
+                        if ($grandTotalTitles >= $minimumreq) {
                             $titleNeeded = 0;
                         } else {
-                            $titleNeeded = 5 - $grandTotalTitles;
+                            $titleNeeded = $minimumreq - $grandTotalTitles;
                         }
                         @endphp
                         <td>{{ $titleNeeded }}</td>
                         
-                            <td>
+
+                    @php
+                    $nextTotalTitlesNeeded = 0;
+                    $advanceyear = 0;
+                    @endphp
+
+                    @foreach ($courseGroup as $book)
+                        @php
+                        $nextTotalTitlesNeeded = ($book->book_year == $lastYearToRemoveData) ? $book->total_titles : $nextTotalTitlesNeeded;
+                        $advanceyear = ($book->book_year == 2024);
+                        @endphp
+                    @endforeach
+
+                    <td>{{ max(0, $nextTotalTitlesNeeded - $advanceyear) }}</td>
+                            <!-- <td>
                                 @php
                                     $year = $courseGroup->first()->book_year;
                                     $grandTotalTitlesNeeded += $titleNeeded;
                                     $nextTotalTitlesNeeded = ($year == $lastYearToRemoveData) ? $book->total_titles : 0;
                                 @endphp
                                 {{ $nextTotalTitlesNeeded }}
-                            </td>
+                            </td> -->
                         @php
                             $grandTotalNextTitlesNeeded += $nextTotalTitlesNeeded;
                             $totalTitlesBelow = 0;
@@ -172,11 +185,7 @@
             </table>
             <div class="card">        
                     <table class="table ">
-                            @php
-                                $previousCourseGroup = null;
-                                $courseCount = 0;
-                                $totalCourseCount = 0;
-                            @endphp
+
                             <tr>
                                 <th colspan="3">Minimum Requirements</th>
                             </tr>
@@ -185,48 +194,58 @@
                                 <th>Total</th>
                             </tr>
                             
+                            @php
+                                $courseCounts = [];
+                                $previousCourseGroup = null;
+                                $totalCourseCount = 0;
+                                @endphp
 
-                            @foreach ($groupedBooks as $courseId => $courseGroup)
-                                @php
+                                @foreach ($groupedBooks as $courseId => $courseGroup)
+                                    @php
                                     $currentCourseGroup = $courseGroup[0]->course->course_group;
-                                @endphp
+                                    @endphp
 
-                                @if ($currentCourseGroup !== $previousCourseGroup)
-                                    @if ($previousCourseGroup !== null)
-                                        <tr>
-                                            <td>{{ $previousCourseGroup }}</td>
-                                            <td>{{ $courseCount }}</td>
-                                            <td>{{ $courseCount * 5 }}</td>
-                                        </tr>
-                                    @endif
+                                    @if ($currentCourseGroup !== $previousCourseGroup)
+                                        @if ($previousCourseGroup !== null)
+                                            <tr>
+                                                <td>{{ $previousCourseGroup }}</td>
+                                                <td>{{ $courseCounts[$previousCourseGroup] }}</td>
+                                                <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
+                                            </tr>
+                                        @endif
 
-                                    @php
+                                        @php
                                         $previousCourseGroup = $currentCourseGroup;
-                                        $courseCount = 1; // Reset the course count for the new group
-                                    @endphp
-                                @else
+                                        if (!isset($courseCounts[$currentCourseGroup])) {
+                                            $courseCounts[$currentCourseGroup] = 1;
+                                        } else {
+                                            $courseCounts[$currentCourseGroup]++;
+                                        }
+                                        @endphp
+                                    @else
+                                        @php
+                                        $courseCounts[$currentCourseGroup]++;
+                                        @endphp
+                                    @endif
                                     @php
-                                        $courseCount++;
+                                    $totalCourseCount++;
+                                    $minimumTotal = $totalCourseCount;
                                     @endphp
-                                @endif
+                                @endforeach
 
-                                @php
-                                    $totalCourseCount += $courseCount;
-                                    $minimumTotal = $totalCourseCount - 1;
-                                @endphp
-                            @endforeach
+                                {{-- After the loop, display the total count for the last group --}}
+                                <tr>
+                                    <td>{{ $previousCourseGroup }}</td>
+                                    <td>{{ $courseCounts[$previousCourseGroup] }}</td>
+                                    <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
+                                </tr>
 
-                            {{-- After the loop, display the total count for the last group --}}
-                            <tr>
-                                <td>{{ $previousCourseGroup }}</td>
-                                <td>{{ $courseCount }}</td>
-                                <td>{{ $courseCount * 5 }}</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: right; font-weight: bold;">Grand total</td>
-                                <td><strong>{{ $minimumTotal }}</strong></td>
-                                <td><strong>{{ $minimumTotal * 5 }}</strong></td>
-                            </tr>
+                                {{-- Display the grand total by adding up all course counts --}}
+                                <tr>
+                                    <td style="text-align: right;"><strong>Grand Total:</strong></td>
+                                    <td><strong>{{ $totalCourseCount }}</strong></td>
+                                    <td><strong>{{ $totalCourseCount * $minimumreq }}</strong></td>
+                                </tr>
                         </table>
                     </div>
                     <div class="card">
@@ -278,7 +297,7 @@
                                     </tr>
                                 </thead>
                                 <tr>
-                                    <td height="9%" style="font-weight: bolder; font-size:30px; color: red;">{{ $compiledPercentage }}%</td>
+                                    <td height="9%" style="font-weight: bolder; font-size:30px; color: red;">{{ number_format($compiledPercentage, 2) }}%</td>
                                     </tr>
                                     <tr>
                                         <td>Current Titles Needed: {{ $grandTotalTitlesNeeded  }}</td>
@@ -291,11 +310,30 @@
                         </div>
                     </div>
                 </div>
-    </table>
     <footer>
-        
-        <p>Printed in: {{ date("Y-m-d h:i A") }}</p>
+
+    <div class="signature-container">
+        <div class="signature">
+            <p>Prepared by:</p>
+            <h4>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}, MLIS</h4>
+            <h5>Librarian-In-Charge, {{ Auth::user()->assigned_department }}</h5>
+        </div>
+        <div class="signature">
+            <p>Noted:</p>
+            <h4>YVES ARISTEO A. FEBRES, RL, MLIS</h4>
+            <h5>Director, LRDS</h5>
+        </div>
+    </div>
 
     </footer>
-</body>
+        <table class="table" id="GrandTotal">
+            <tr>
+                <th>Total Number of Titles:</th>
+                <th>{{$total->total_titles}}</th>
+            </tr>
+            <tr>
+                <td>Total Number of Volumes:</td>
+                <td>{{$total->total_volumes}}</td>
+            </tr>
+    </body>
 </html>

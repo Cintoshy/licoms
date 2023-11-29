@@ -80,7 +80,8 @@
                                     <form action="{{ route('admin.course.destroy', $course) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash text-white"></i></button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteCourseModal{{$course->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.Courses.deleteCourseModal')
                                     </form>
                                 </td>
                             </tr>

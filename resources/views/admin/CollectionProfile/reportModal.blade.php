@@ -9,13 +9,13 @@
             </div>
             <div class="modal-body">
             <div class="container">
-                <form id="reportForm" method="POST" action="{{ route('export.collection-profile') }}">
+                <form id="reportForm" method="POST" action="{{ route('export.collection-profile', ['param' => $ProgramCode ]) }}">
                     @csrf
                     <div class="form-group">
                         <label for="page_size">Page Size:</label>
                         <select name="page_size" id="page_size" class="form-control">
                             <option value="A4">A4</option>
-                            <option value="Letter">Letter</option>
+                            <!-- <option value="Letter">Letter</option> -->
                             <!-- Add more page size options if needed -->
                         </select>
                     </div>
@@ -24,7 +24,7 @@
                         <label for="orientation">Page Orientation:</label>
                         <select name="orientation" id="orientation" class="form-control">
                             <option value="portrait">Portrait</option>
-                            <option value="landscape">Landscape</option>
+                            <!-- <option value="landscape">Landscape</option> -->
                         </select>
                     </div>
 

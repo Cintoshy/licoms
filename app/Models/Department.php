@@ -12,5 +12,11 @@ class Department extends Model
     protected $fillable = [
         'department_name',
         'description',
+        'logo',
     ];
+
+    public function programs()
+    {
+        return $this->hasMany(Program::class, 'department_name', 'department');
+    }
 }

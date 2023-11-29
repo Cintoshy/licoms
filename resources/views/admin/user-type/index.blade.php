@@ -31,7 +31,8 @@
                             <th>Contact</th>
                             <th>Email</th>
                             <th>Type of User</th>
-                            <th>Assigned Program</th>
+                            <th> Assigned Program</th>
+                            <th>Department</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -56,14 +57,16 @@
                                     @else
                                         Unknown role
                                     @endif
-                                <td>{{ $employee->assigned_program ?? 'None' }}</td>
+                                <td>{{ $employee->assigned_program ?? 'All' }}</td>
+                                <td>{{ $employee->assigned_department ?? $employee->assignedProgram->department ?? 'All' }}</td>
                                 </td>
                                 <td>
                                 <button class="btn btn-primary btn" onclick="openEditUserModal('{{ route('admin.users.edit', $employee) }}')"><i class="fa-solid fa-pen-to-square"></i></button>
                                     <form action="{{ route('admin.users.destroy', $employee) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn"><i class="fas fa-trash text-white"></i></button>
+                                        <button type="button" class="btn btn-danger btn" data-toggle="modal" data-target="#deleteUserModal{{$employee->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.user-type.deleteModal')
                                     </form>
                                 </td>
                             </tr>

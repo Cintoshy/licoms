@@ -32,10 +32,6 @@
                         <td class="text-left">{{ $book->author }}</td>
                         </tr>
                         <tr>
-                        <th scope="row">STATUS :</th>
-                        <td class="text-left">{{ $book->title }}</td>
-                        </tr>
-                        <tr>
                         <th scope="row">PUBLISH :</th>
                         <td class="text-left">{{ $book->publish }}</td>
                         </tr>

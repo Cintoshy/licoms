@@ -43,7 +43,8 @@
                                     <form action="{{ route('admin.courseGroup.destroy', $courseGroup) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash text-white"></i></button>
+                                        <button type="button" class="btn btn-danger"data-toggle="modal" data-target="#deleteCourseGroupModal{{$courseGroup->id}}"><i class="fas fa-trash text-white"></i></button>
+                                        @include('admin.courseGroup.deleteCourseGroupModal')
                                     </form>
                                 </td>
                             </tr>

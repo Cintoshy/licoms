@@ -1,0 +1,55 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #000;
+    padding: 0 3px;
+    text-align: center;
+   
+}
+thead{
+    border: 1px solid #000;
+}
+th {
+    background-color: #83C8E4;
+}
+
+h6, h4{
+    margin: 0;
+}
+h6{
+    margin-top: 10px;
+}
+
+header{
+    margin: 0;
+    text-align: center;
+}
+
+
+  
+  .card { 
+    display: inline-block;
+    width: 31%; 
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin:0 5px;
+  }
+  
+  .card:first-child {
+    margin-left: 0; 
+  }
+  
+  .card:last-child {
+    margin-right: 0; 
+  }
+  #body-table{
+    margin-top: 25px;
+    width : auto ;
+
+  }
+
+
+

@@ -9,10 +9,10 @@
                 </div>
                 <div class="modal-body">
                     @php
-                    $compiledPercentage = $grandTotalresultPercentage    + $totalAdditionalPercentage;
+                    $compiledPercentage = $grandTotalresultPercentage + $totalAdditionalPercentage;
                     @endphp
 
-                <h1 class="display-1 text-danger text-center py-3">{{ $compiledPercentage }}%</h1>
+                <h1 class="display-1 text-danger text-center py-3">{{ number_format($compiledPercentage, 2) }}%</h1>
                 <hr>
                 <div>
                     <h6>Current Titles Needed: {{ $grandTotalTitlesNeeded  }}</h6>

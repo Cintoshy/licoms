@@ -18,9 +18,10 @@ class CreateProgramsTable extends Migration
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->string('department');
+            $table->integer('minimum_req');
             $table->timestamps();
 
-            $table->foreign('department')->references('department_name')->on('departments')->onDelete('cascade');
+            $table->foreign('department')->references('department_name')->on('departments')->onDelete('restrict');
         });
     }
 

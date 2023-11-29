@@ -16,14 +16,14 @@
     <ul class="navbar-nav sidebar sidebar-dark  accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand d-flex align-items-center justify-content-center">
             <div class="sidebar-brand-icon">
             <img src="{{ asset('img/1234.png') }}" style="width:45px">
             </div> 
             <div class="sidebar-brand-text mx-1">
             <img src="{{ asset('img/1230.png') }}" style="width:100px">
             </div>
-        </a>
+        </div>
 
             @php
                 $role = auth()->user()->role;
@@ -148,26 +148,17 @@
 
             <div class="links">
             <!-- Nav Item - Charts -->
+
             <li class="nav-item  @if(Route::is('program-chair.index')) active @endif">
                 <a class="nav-link" href="{{ route('program-chair.index') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Dashboard</span></a>
             </li>
-                        <!-- Nav Item - Charts -->
-                        <!-- <li class="nav-item" >
-                <a class="nav-link" href="" data-toggle="collapse" data-target="#bookRecords" aria-expanded="true" aria-controls="bookRecords">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Reports</span></a>
-            
-            <div id="bookRecords" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="">Add</a>
-                        <a class="collapse-item" href="">Edit</a>
-                        <a class="collapse-item" href="">Page</a>
-                
-                    </div>
-                </div>
-            </li> -->
+            <li class="nav-item  @if(Route::is('program-chair.book-evaluation')) active @endif">
+                <a class="nav-link" href="{{ route('program-chair.book-evaluation') }}">
+                    <i class="fas fa-fw fa-book"></i>
+                    <span>Book Evaluation</span></a>
+            </li>
             <li class="nav-item @if(Route::is('pg.reports')) active @endif">
                 <a class="nav-link" href="{{ route('pg.reports') }}">
                 <i class="fas fa-th-list"></i>
@@ -175,18 +166,18 @@
             </li>
             <li class="nav-item @if(Route::is('pg.approvedBooks')) active @endif">
                 <a class="nav-link" href="{{ route('pg.approvedBooks') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+                    <i class="fas fa-circle-check"></i>
                     <span>Approved Books</span></a>
             </li>
             <li class="nav-item @if(Route::is('pg.pendingBooks')) active @endif">
                 <a class="nav-link" href="{{ route('pg.pendingBooks') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+                <i class="fas fa-regular fa-hourglass-half"></i>
                     <span>Pending Books</span></a>
             </li>
 
             <li class="nav-item @if(Route::is('pg.hideRequest')) active @endif">
                 <a class="nav-link" href="{{ route('pg.hideRequest') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+                    <i class="fas fa-fw fa-eye-slash"></i>
                     <span>Hide Requests</span></a>
             </li>
             </div>
@@ -203,7 +194,7 @@
             <li class="nav-item active">
                 <a class="nav-link">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Librarian - {{ $user_role->assigned_program }}</span></a>
+                    <span>Librarian - {{ $user_role->assigned_department }}</span></a>
             </li>
 
             <!-- Divider -->
@@ -222,30 +213,42 @@
                     <span>Dashboard</span></a>
             </li>
             <!-- Nav Item - Charts -->
-            <li class="nav-item @if(Route::is('lib-reports')) active @endif">
-                <a class="nav-link" href="{{ route('lib-reports') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+            <li class="nav-item @if(Route::is('librarian.book-evaluation')) active @endif">
+                <a class="nav-link" href="{{ route('librarian.book-evaluation') }}">
+                    <i class="fas fa-fw fa-book"></i>
+                    <span>Book Evaluation</span></a>
+            </li>
+            <!-- Nav Item - Charts -->
+            <li class="nav-item @if(Route::is('lib-Reports') || Route::is('lib-reports')) active @endif">
+                <a class="nav-link" href="{{ route('lib-Reports') }}">
+                    <i class="fas fa-th-list"></i>
                     <span>Reports</span></a>
             </li>
+            @php
+                $assignedDepartment = auth()->user()->assigned_department;
+                $programs = App\Models\Program::where('department', $assignedDepartment)->get();
+            @endphp
+            <!-- Nav Item - Charts -->
             <li class="nav-item @if(Route::is('lib-books-list')) active @endif">
-                <a class="nav-link" href="{{ route('lib-books-list') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Book List & Approval</span></a>
+                <a class="nav-link" type="button" data-toggle="modal" data-target="#listProgramBookEvaluationModal">
+                    <i class="fas fa-fw fa-list-check"></i>
+                    <span>Book List & Note</span></a>
             </li>
             <!-- Nav Item - Charts -->
             <li class="nav-item @if(Route::is('librarian.approvedBooks')) active @endif">
-                <a class="nav-link" href="{{ route('librarian.approvedBooks') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Approved</span></a>
+                <a class="nav-link" type="button" data-toggle="modal" data-target="#listProgramApprovedBookModal">
+                    <i class="fas fa-circle-check"></i>
+                    <span>Approved Books</span></a>
             </li>
 
             <li class="nav-item @if(Route::is('lib.pendingBooks')) active @endif">
-                <a class="nav-link" href="{{ route('lib.pendingBooks') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Pending</span></a>
+                <a class="nav-link" type="button" data-toggle="modal" data-target="#listProgramPendingBookModal">
+                    <i class="fas fa-regular fa-hourglass-half"></i>
+                    <span>Pending Books</span></a>
             </li>
 
         </div>
+        @include('librarian.modal.listProgramsModal')
         <!-- Librarian End of Sidebar -->
 
 
@@ -273,11 +276,16 @@
             </div>
 
             <div class="links">
-            <!-- Nav Item - Charts -->
             <li class="nav-item @if(Route::is('faculty.dashboard')) active @endif">
                 <a class="nav-link" href="{{ route('faculty.dashboard') }}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Dashboard</span></a>
+            </li>
+            <!-- Nav Item - Charts -->
+            <li class="nav-item @if(Route::is('faculty.bookEvaluation')) active @endif">
+                <a class="nav-link" href="{{ route('faculty.bookEvaluation') }}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Book Evaluation</span></a>
             </li>
             <!-- Nav Item - Charts -->
             <li class="nav-item @if(Route::is('fac.approvedBooks')) active @endif">
@@ -293,20 +301,9 @@
             </li>
             <li class="nav-item @if(Route::is('fac.archivedBooks')) active @endif">
                 <a class="nav-link" href="{{ route('fac.archivedBooks') }}">
-                <i class="fas fa-regular fa-hourglass-half"></i>
+                <i class="fas fa-sm fa-regular fa-eye-slash"></i>
                     <span>Archived Books</span></a>
             </li>
-
-            <!-- Nav Item - Tables -->
-            
-            <div class="dropdown px-3 my-3" >
-                <input type="text" style="font-size:12px;" class="form-control dropdown-toggle search-input" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="Search Course Code">
-                    <div class="dropdown-menu dropdown-options" aria-labelledby="dropdownMenuButton">
-                     @foreach ($courses as $course)
-                     <a class="dropdown-item" style="font-size:10px;">{{ $course->course_code }} - {{ $course->course_title }}</a>
-                     @endforeach
-                    </div>
-                </div>
             </div>
 
 
@@ -331,25 +328,48 @@
 
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand bg-gradient-light topbar mb-4 static-top shadow">
-
+                    
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
                     
 
-                    @if ($role !== 0) 
-                    <h6 class="fw-bolder">
+
+                    @if ($role === 0) 
+                    <h2 class="fw-bolder text-dark mt-1">
+                        <em>
+                        Administrator
+                        </em>
+                    </h2>
+                    @elseif($role === 1 || $role === 3)
+                    @php
+                    $assignedProgram = auth()->user()->assignedProgram;
+                    if ($assignedProgram ) {
+                        $department = $assignedProgram->department;
+                        $programs = App\Models\Department::where('department_name', $department)->first();
+                        $logo = $programs->logo;
+                    }
+                    @endphp
+                    <img class="p-0 mr-3 ms-0" src="{{ asset('storage/' .$logo) }}" alt="Department Logo" width="70">
+                     <h6 class="fw-bolder text-dark mt-1" id="program_name">
                         <em>
                         {{ Auth::user()->assignedProgram->description }}
                         <!-- <i class="fa-solid fa-house-flag ms-1"></i> -->
                         </em>
                     </h6>
-                     @else 
-                        <h2 class="fw-bolder">
+                    @elseif($role === 2)
+                    @php
+                    $logo = Auth::user()->assignedDepartment->logo;
+                    @endphp
+                    <img class="p-0 mr-3 ms-0" src="{{ asset('storage/' .$logo) }}" alt="Department Logo" width="70">
+                    <h6 class="fw-bolder text-dark mt-1" id="program_name">
                         <em>
-                        Administrator
+                        {{ Auth::user()->assignedDepartment->description }}
+                        <i class="fa-solid fa-house-flag ms-1"></i>
                         </em>
-                    </h2>
+                    </h6>
                     @endif
                     <ul class="navbar-nav ml-auto">
-
 
                     @if ($role !== 0) 
 
@@ -416,7 +436,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link text-secondary dropdown-toggle " id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                               
+                                <img class="rounded-circle mr-2" src="{{ $profilePictureUrl }}"  width="35">
                                 <div>
                                     <i class="fas fa-user fa-sm fa-fw"></i>
                                     <span class="d-none d-lg-inline small">
@@ -453,20 +473,20 @@
                                     <a class="dropdown-item" 
                                         href="{{ route('pgActivityLogs') }}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Activity Log
+                                        Activity
                                         </a>
                                     @elseif ($user_role->role === 2)
                                     <a class="dropdown-item" 
                                         href="{{ route('activityLogs') }}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Activity Log
+                                        Activity    
                                         </a>
 
                                         @elseif ($user_role->role === 3)
                                     <a class="dropdown-item" 
                                         href="{{ route('activityLogs') }}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Activity Log
+                                        Activity
                                     </a>
                                     @endif 
 

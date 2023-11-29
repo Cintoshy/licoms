@@ -12,7 +12,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="POST" class="mb-1" action="{{ route('lib-books.verified-status', $requestedBook->id) }}">
+                                <form method="POST" class="mb-1" action="{{ route('lib-books.approve-status', $requestedBook->id) }}">
                                         @csrf
                                         @method('PUT')
                                         <button type="submit" class="btn btn-success">Confirm</button>
