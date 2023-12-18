@@ -1,7 +1,5 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
-console.log(bookYears);
-console.log(bookData);
-var numberOfYears = fiveYearsBelow.length;
+var numberOfYears = years.length;
 
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';
@@ -36,9 +34,9 @@ var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: fiveYearsBelow, // Use the bookYears array as labels
+    labels: years, // Use the bookYears array as labels
     datasets: [{
-      label: "Books Approved",
+      label: "No. of Titles",
       lineTension: 0.3,
       backgroundColor: "rgba(78, 115, 223, 0.05)",
       borderColor: "rgba(78, 115, 223, 1)",
@@ -50,7 +48,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: bookData,
+      data: yearBookCounts,
     }],
   },
   options: {

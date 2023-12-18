@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Program;
+use App\Models\Department;
 
 class CollectionProfileController extends Controller
 {
@@ -39,7 +40,8 @@ class CollectionProfileController extends Controller
         // $course = Course::all();
         // $programs = Program::all();
         // $courseGroups = CourseGroup::all();
+        $departments = Department::all();
 
-        return view('admin.CollectionProfile.listDepartments');
+        return view('admin.CollectionProfile.listDepartments', compact('departments'));
     }
 }

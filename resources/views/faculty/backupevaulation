@@ -43,16 +43,16 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-lg table-bordered text-dark table-striped" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-lg table-bordered text-dark table-striped" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Call #</th>
+                            <th>CN</th>
                             <th>Book Title</th>
                             <th>Author</th>
                             <th>Publisher</th>    
                             <th>Volume</th>
                             <th>Year</th>
-                            <th width="20%">Course Code - Course</th>
+                            <th width="20%">Course Subject</th>
                             <th width="10%">Action</th>
                             <th>Deadline</th>
                         </tr>
@@ -73,7 +73,7 @@
                                 <td class="align-middle">
                                 <form action="{{ route('fac-select.book', $book->id) }}" method="post" class="mb-3">
                                     @csrf
-                                    <div class="input-group mt-3">
+                                    <div class="input-group">
                                         <select class="selectpicker form-control" id="selectpickerrr" data-live-search="true" id="dropdown-options" name="course_code" required>
                                             <option></option>
                                             @foreach ($courses as $course)
@@ -87,10 +87,8 @@
                                             </span>
                                         </button>
                                     </div>
-                                    @include('faculty.modal.selectBookModal')
                                 </form>
-
-
+                                @include('faculty.modal.selectBookModal')
 
                                 <!-- <form action="{{ route('fac-select.book', $book->id) }}" method="post">
                                 @csrf
@@ -116,18 +114,18 @@
                                 </select> -->
 
                                 </td>
-                                <td class="align-middle">
-                                    <button class="btn btn-secondary w-100" type="button" data-toggle="modal" data-target="#ignoreBookModal{{$book->id}}">
+                                <td>
+                                    <button class="btn btn-warning btn-sm w-100 mt-1" type="button" data-toggle="modal" data-target="#hideBookModal{{$book->id}}">
                                             <span class="icon text-light">
-                                            Ignore
+                                            Stash
                                                 <i class="fa-solid fa-eye-slash ms-1"></i>
                                             </span>
                                         </button>
-                                @include('faculty.modal.ignoreRequestBookModal')
+                                @include('faculty.modal.hideBookModal')
                             </td>
                                 <td>
                                     @php
-                                        $dueDate = $book->created_at->addDays(5);
+                                        $dueDate = $book->created_at->addWeeks(2);
                                         $now = now();
                                         $remainingDays = $dueDate->diffInDays($now);
                                     @endphp

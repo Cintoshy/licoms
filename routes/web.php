@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\RequestedBooks;
 use App\Models\CourseGroup;
 use Illuminate\Notifications\DatabaseNotification;
+use App\Http\Controllers\strorage_path;
 
 
 Route::get('/', function () {
@@ -65,6 +66,11 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Panel Route//
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/downloadTemplate',  [BookController::class, 'bookListTemplate'])->name('download.bookListTemplate');
+});
+
 Route::prefix('admin')->middleware(['auth', 'admin', 'cache'])->group(function () {
 
 
@@ -78,7 +84,7 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'cache'])->group(function (
     Route::get('/collectionProfile', [BookController::class, 'report'])->name('admin.CollectionProfile.index');
     Route::get('/listOfDepartments', [CollectionProfileController::class, 'listDepartments'])->name('admin.listDepartments.index');
 
-
+    Route::get('/sample', [BookController::class, 'sampleReport']);
     // Course Group
     Route::get('/courseGroups', [CourseGroupController::class, 'index'])->name('admin.courseGroup.index');
     Route::post('/courseGroup-added', [CourseGroupController::class, 'store'])->name('admin.courseGroup.store');
@@ -136,7 +142,6 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'cache'])->group(function (
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
 
-
     Route::get('/import',  [ImportController::class, 'showImportForm'])->name('import.form');
     Route::post('/import',  [ImportController::class, 'import'])->name('import');
 });
@@ -158,6 +163,14 @@ Route::prefix('programChair')->middleware(['auth', 'programchair', 'cache'])->gr
     Route::put('/updateStatus/{id}', [BookController::class, 'verified'])->name('pg-books.verified-status');
     Route::put('/cancelStatus/{id}', [BookController::class, 'cancelVerifyBook'])->name('pg-cancelVerified-status');
     Route::delete('/rejectBook/{requestedBook}', [BookController::class, 'PCrefuseBookRequest'])->name('pg-books.refuse-status');
+
+    Route::get('/ignoredRequests', [BookController::class, 'PCignoredRequest'])->name('pg.PCignoredRequest');
+    Route::put('/confirmRequest{id}', [BookController::class, 'ignoreBook'])->name('pg.PCconfirmIgnoreRequestBook');
+    Route::get('/refuseIgnoreRequest{id}', [BookController::class, 'PCrefuseIgnoreRequestBook'])->name('pg.refuseIgnoreRequest');
+    Route::get('/ignoredBooks', [BookController::class, 'ignoredBooks'])->name('pg.ignoredBooks');
+    Route::get('/restoreBook{id}', [BookController::class, 'confirmIgnoreRequestBook'])->name('pg.confirmIgnoreRequestBook');
+
+    Route::put('/editCourseCode{id}', [BookController::class, 'editCourseCode'])->name('pg.editCourseCode');
 });
 
 // Library Routes
@@ -178,6 +191,9 @@ Route::prefix('librarian')->middleware(['auth', 'librarian', 'cache'])->group(fu
     Route::put('/updateStatus/{id}', [BookController::class, 'approveBook'])->name('lib-books.approve-status');
     Route::delete('/rejectBook/{requestedBook}', [BookController::class, 'libRefuseBookRequest'])->name('lib-books.refuse-status');
     Route::post('/export-booksNoted', [BookController::class, 'exportBooks'])->name('export-Books');
+    Route::put('/bookIgnore/{id}', [BookController::class, 'libIgnoreRequest'])->name('lib.books.ignoreBook');
+    Route::get('/ignoredBooks', [BookController::class, 'ignoredBooks'])->name('lib.ignoredBooks');
+
 
 });
 
@@ -185,18 +201,22 @@ Route::prefix('librarian')->middleware(['auth', 'librarian', 'cache'])->group(fu
 Route::prefix('faculty')->middleware(['auth', 'faculty', 'cache'])->group(function () {
     Route::get('/dashboard', [BookController::class, 'facultyIndex'])->name('faculty.dashboard');
     Route::get('/bookEvaluation', [BookController::class, 'facultyBookEvaluation'])->name('faculty.bookEvaluation');
-    Route::get('/archivedBooks', [BookController::class, 'archivedBooks'])->name('fac.archivedBooks');
-    Route::get('/cancelHideBook{id}', [BookController::class, 'RefuseHideRequest'])->name('fac.RefuseHideRequest');
+    Route::get('/ignoredBooks', [BookController::class, 'ignoredBooks'])->name('fac.ignoredBooks');
+    Route::get('/ignoredRequest', [BookController::class, 'ignoredRequest'])->name('fac.ignoredRequest');
+
+    Route::get('/undoIgnoreBook{id}', [BookController::class, 'undoIgnoredBook'])->name('fac.undoIgnoredBook');
+
+    Route::get('/undoIgnoreRequestBook{id}', [BookController::class, 'undoIgnoreRequestBook'])->name('fac.undoIgnoreRequestBook');
     Route::get('/showBooksss/{book}', [BookController::class, 'show'])->name('fac-books.show');
-    Route::put('/books/{id}', [BookController::class, 'updateProgramHideRequest'])->name('fac.books.updateProgramHideRequest');
+
     Route::post('/select-book/{id}', [BookController::class, 'selectBook'])->name('fac-select.book');
-    Route::put('/cancelStatus/{id}', [BookController::class, 'cancelBook'])->name('fac-books.cancel-status');
     Route::get('/approvedBooks', [BookController::class, 'approvedBooks'])->name('fac.approvedBooks');
     Route::get('/pendingBooks', [BookController::class, 'pendingBooks'])->name('fac.pendingBooks');
     Route::delete('/books/{requestedBook}', [BookController::class, 'cancelSelectedBook'])->name('fac.cancelSelectedBook');
     Route::get('/activityLogs', [ActivityLog::class, 'index'])->name('activityLogs');
+    Route::put('/books/{id}', [BookController::class, 'ignoreRequest'])->name('fac.books.ignoreBook');
 
-    
+    Route::put('/bookscopy/{id}', [BookController::class, 'ignoreBook'])->name('fac.books.ignoreBookkk');
 
 });
 

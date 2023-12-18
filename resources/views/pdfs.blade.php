@@ -55,6 +55,9 @@
                     $additionalPercentage = 0;
                     $allTitlesGrantTotal = 0;
                     $courseGroups = collect();
+                    $grandTotalresultPercentage = 0;
+                    $totalAdditionalPercentage = 0;
+                    
                 @endphp
                 @foreach ($groupedBooks as $courseId => $courseGroup)
                     @php
@@ -234,11 +237,13 @@
                                 @endforeach
 
                                 {{-- After the loop, display the total count for the last group --}}
-                                <tr>
-                                    <td>{{ $previousCourseGroup }}</td>
-                                    <td>{{ $courseCounts[$previousCourseGroup] }}</td>
-                                    <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
-                                </tr>
+                                    @if ($previousCourseGroup !== null && $previousCourseGroup !== '' && isset($courseCounts[$previousCourseGroup]))
+                                        <tr>
+                                            <td>{{ $previousCourseGroup }}</td>
+                                            <td>{{ $courseCounts[$previousCourseGroup] }}</td>
+                                            <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
+                                        </tr>
+                                    @endif
 
                                 {{-- Display the grand total by adding up all course counts --}}
                                 <tr>
@@ -275,12 +280,12 @@
 
                                     <tr>
                                         <td>{{ $totalActiveCollectionTotalTitles }}</td>
-                                        <td>{{ $totalActiveCollectionTotalVolumes * 2 }}</td>
+                                        <td>{{ $totalActiveCollectionTotalVolumes }}</td>
                                     </tr>
                                 @endforeach
                                 <tr>
                                     <td><strong>{{ $grandActiveCollectionTotalTitles }}</strong></td>
-                                    <td><strong>{{ $grandActiveCollectionTotalVolumes * 2 }}</strong></td>
+                                    <td><strong>{{ $grandActiveCollectionTotalVolumes }}</strong></td>
                                 </tr>
                             </tbody>
                         </table>

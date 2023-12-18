@@ -20,7 +20,6 @@
                 <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>CN</th>
                             <th>Title</th>
                             <th>Author</th>
@@ -37,7 +36,6 @@
                     <tbody>
                         @foreach($requestedBooks as $requestedBook)
                             <tr>
-                                <td>{{ $requestedBook->book->id }}</td>
                                 <td>{{ $requestedBook->book->call_number }}</td>
                                 <td>{{ $requestedBook->book->title }}</td>
                                 <td>{{ $requestedBook->book->author }}</td>

@@ -13,20 +13,153 @@
                     Generate Report
                     <i class="fas fa-download fa-sm text-white-50"></i>
                 </button>
-                <div class="btn-group" role="group" aria-label="Button Group">
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ActivieCollection">
-                        <span class="text">Active Collection
-                        </span>
-                    </button>
-                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#MinimumRequirements">
-                        <span class="text">Min. Requirements
-                        </span>
-                    </button>
-                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#CompliedPercentage">
-                        <span class="text">Complied Percentage
-                        </span>
-                    </button>
-                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col">
+        <table class="table table-bordered table-sm text-center table-secondary text-dark" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th colspan="3">Minimum Requirements</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">Courses</th>
+                       </tr>
+                        <tr>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    @php
+                        $courseCounts = []; 
+                        $previousCourseGroup = null;
+                        $totalCourseCount = 0;
+                        @endphp
+
+                        @foreach ($groupedBooks as $courseId => $courseGroup)
+                            @php
+                            $currentCourseGroup = $courseGroup[0]->course->course_group;
+                            @endphp
+
+                            @if ($currentCourseGroup !== $previousCourseGroup)
+                                @if ($previousCourseGroup !== null)
+                                    <tr>
+                                        <td>{{ $previousCourseGroup }}</td>
+                                        <td>{{ $courseCounts[$previousCourseGroup] }}</td>
+                                        <td>{{ $courseCounts[$previousCourseGroup] * $minimumreq }}</td>
+                                    </tr>
+                                @endif
+
+                                @php
+                                $previousCourseGroup = $currentCourseGroup;
+                                if (!isset($courseCounts[$currentCourseGroup])) {
+                                    $courseCounts[$currentCourseGroup] = 1;
+                                } else {
+                                    $courseCounts[$currentCourseGroup]++;
+                                }
+                                @endphp
+                            @else
+                                @php
+                                $courseCounts[$currentCourseGroup]++;
+                                @endphp
+                            @endif
+                            @php
+                            $totalCourseCount++;
+                            $minimumTotal = $totalCourseCount;
+                            @endphp
+                        @endforeach
+
+                        {{-- After the loop, display the total count for the last group --}}
+                        <tr>
+                            <td>{{ $previousCourseGroup }}</td>
+                            <td>{{ $courseCounts[$previousCourseGroup] ?? 0 }}</td>
+                            <td>{{ ($courseCounts[$previousCourseGroup] ?? 0) * $minimumreq }}</td>
+                        </tr>
+
+                        {{-- Display the grand total by adding up all course counts --}}
+                        <tr>
+                            <td style="text-align: right;"><strong>Grand Total:</strong></td>
+                            <td><strong>{{ $totalCourseCount }}</strong></td>
+                            <td><strong>{{ $totalCourseCount * $minimumreq }}</strong></td>
+                        </tr>
+
+                    </tbody>
+                    
+                </table>
+        </div>
+        <div class="col">
+        <table class="table table-bordered text-center table-sm table-secondary text-dark" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th colspan="3">Active Collection</th>
+                            </tr>
+                            <tr>
+                                <th>Course Group</th>
+                                <th>Total Titles</th>
+                                <th>Total Volumes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $grandTotalTitles = 0;
+                                $grandTotalVolumes = 0;
+                            @endphp
+
+                            @foreach ($courseGroupsssBooksTitle as $courseId => $courseGroup)
+                                @php
+                                    $totalTitles = $courseGroup->sum('total_titles');
+                                    $totalVolumes = $courseGroup->sum('total_volumes');
+                                    $grandTotalTitles += $totalTitles;
+                                    $grandTotalVolumes += $totalVolumes;
+                                @endphp
+
+                                <tr>
+                                    <td>{{ $courseId }}</td>
+                                    <td>{{ $totalTitles }}</td>
+                                    <td>{{ $totalVolumes }}</td>
+                                </tr>
+                            @endforeach
+
+                            {{-- Display the grand totals --}}
+                            <tr>
+                            <td style="text-align: right;"><strong>Grand Total:</strong></td>
+                                <td><strong>{{ $grandTotalTitles }}</strong></td>
+                                <td><strong>{{ $grandTotalVolumes }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+        </div>
+        @php    
+                    $previousCourseGroup = null;
+                    $TotalresultPercentage = 0; 
+                    $grandTotalTitlesNeeded = 0;
+                    $grandTotalNextTitlesNeeded = 0;
+                    $rowCount = 0;
+                    $additionalPercentage = 0;
+                    $allTitlesGrantTotal = 0;
+                    $courseGroups = collect();
+                    $grandTotalresultPercentage = 0;
+                    $totalAdditionalPercentage = 0;
+
+                @endphp
+            <div class="col">
+                <table class="table table-sm table-secondary text-dark" width="100%" cellspacing="0">
+                    <tr>
+                        <td class="fw-bold text-center">COMPILED PERCENTAGE</td>
+                    </tr>
+                    <tr>
+                        <td class="display-6 text-danger text-center py-3">{{number_format($compiledPercentage, 2)}}%</td>
+                    </tr>
+                    <tr>
+                        <td>Curent Titles Needed:</td>
+                    </tr>
+                    <tr>
+                        <td>Next Year Titles Needed:</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
@@ -63,19 +196,7 @@
                         <th>V</th>
                     </tr>
                 </thead>
-                @php    
-                    $previousCourseGroup = null;
-                    $TotalresultPercentage = 0; 
-                    $grandTotalTitlesNeeded = 0;
-                    $grandTotalNextTitlesNeeded = 0;
-                    $rowCount = 0;
-                    $additionalPercentage = 0;
-                    $allTitlesGrantTotal = 0;
-                    $courseGroups = collect();
-                    $grandTotalresultPercentage = 0;
-                    $totalAdditionalPercentage = 0;
 
-                @endphp
                 @foreach ($groupedBooks as $courseId => $courseGroup)
                     @php
                         
@@ -166,11 +287,16 @@
                     @endforeach
 
                     <td>{{ max(0, $nextTotalTitlesNeeded - $advanceyear) }}</td>
+                            <!-- <td>
                                 @php
+                                    $yearsss = 2019;
                                     $grandTotalTitlesNeeded += $titleNeeded;
-                                    $grandTotalNextTitlesNeeded += $nextTotalTitlesNeeded;
+                                    $nextTotalTitlesNeeded = ($yearsss == $lastYearToRemoveData) ? $book->total_titles : 0;
                                 @endphp
+                                {{ $nextTotalTitlesNeeded }}
+                            </td> -->
                         @php
+                            $grandTotalNextTitlesNeeded += $nextTotalTitlesNeeded;
                             $totalTitlesBelow = 0;
                             $totalVolumesBelow = 0;
                         @endphp

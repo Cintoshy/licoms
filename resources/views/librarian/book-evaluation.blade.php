@@ -26,7 +26,11 @@
                     @foreach($requestedBooks as $requestedBook)
                         <tr>
                             <td>{{ $requestedBook->course->course_code }}</td>
-                            <td>{{ $requestedBook->book->title }}</td>
+                            <td>
+                                <a class="text-dark" href="{{ route('lib-books.show', $requestedBook->book->id) }}">
+                                {{ $requestedBook->book->title }}
+                                </a>
+                            </td>
                             <td>{{ $requestedBook->course->course_title }}</td>
                             <td>{{ $requestedBook->program_name }}</td>
                             <td>{{ $requestedBook->faculty->first_name }}</td>

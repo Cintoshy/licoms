@@ -25,7 +25,6 @@
                 <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Course Group</th>
                             <th>Description</th>
                             <th width="10%">Action</th>
@@ -34,7 +33,6 @@
                     <tbody>
                         @foreach($courseGroup as $courseGroup)
                             <tr>
-                                <td>{{ $courseGroup->id }}</td>
                                 <td>{{ $courseGroup->course_group }}</td>
                                 <td>{{ $courseGroup->description }}</td>
 

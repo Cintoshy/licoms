@@ -10,9 +10,13 @@ th, td {
 }
 thead{
     border: 1px solid #000;
-}
+} 
 th {
-    background-color: #83C8E4;
+  background-color: #83C8E4;
+}
+#ccourse{
+  text-align: left;
+  background-color: #c5c5c5;
 }
 
 h6, h4{

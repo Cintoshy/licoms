@@ -24,6 +24,8 @@ use PDF;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Mail\BookApprovalMail;
+use Illuminate\Support\Facades\Storage;
+
 
 
 
@@ -276,9 +278,30 @@ class BookController extends Controller
         $requestedBooks = RequestedBooks::where('program_name', $programId)
                                         ->where('status', 'Selected')
                                         ->get();
+
+                                        $courses = Course::whereHas('program', function ($query) use ($programId) {
+                                            $query->where('assigned_program', $programId);
+                                        })->get();
     
-        return view('programChair.book_evaluation', compact('requestedBooks'));
+        return view('programChair.book_evaluation', compact('requestedBooks', 'courses'));
     }
+
+    public function editCourseCode(Request $request, $id)
+    {
+
+    
+        // Retrieve requested books for the same program as the program chair   
+        $requestedBooks = RequestedBooks::find($id);
+        
+        $requestedBooks->update([
+            'course_id' => $request->input('course_id'),
+        ]);
+    
+        return redirect()->back()->with('checked', 'Updated successfully');
+    }
+
+
+
 
     
     
@@ -349,24 +372,24 @@ class BookController extends Controller
         return view('faculty.book-evaluation', compact('books', 'courses'));
     }
 
-    public function updateProgramHideRequest($id)
+    public function ignoreBook($id)
     {   
             $user = Auth::user();
             $programId = $user->assigned_program;
             $book = Book::find($id);
             // Retrieve the current value of program_hide_request
-            $currentPrograms = json_decode($book->program_hide_request) ?? [];
+            $currentPrograms = json_decode($book->program_hidden) ?? [];
         
             // Check if the program is not already present in the programs array
             if (!in_array($programId, $currentPrograms)) {
                 $currentPrograms[] = $programId;
         
                 // Update the book's program_hide_request attribute
-                $book->program_hide_request = json_encode($currentPrograms);
+                $book->program_hidden = json_encode($currentPrograms);
                 $book->save();
             }
 
-            return redirect()->back()->with('success', 'Your request to hide the book has been sent to the Program Chair.');
+            return redirect()->back()->with('success', 'The book has been ignored');
     }
     public function acceptHideRequest($id)
     {   
@@ -405,18 +428,14 @@ class BookController extends Controller
 
             return view('programChair.hideRequest', compact('books'));
     }
-    public function archivedBooks()
+    public function ignoredBooks()
     {   
         $user = Auth::user();
         $programId = $user->assigned_program;
     
         // Retrieve books where 'program_hide_request' contains the programId
         // and 'program_hidden' does not contain the programId
-        $books = Book::whereJsonContains('program_hide_request', $programId)
-                     ->where(function ($query) use ($programId) {
-                         $query->whereJsonDoesntContain('program_hidden', $programId)
-                               ->orWhereNull('program_hidden');
-                     })
+        $books = Book::whereJsonContains('program_hidden', $programId)
                      ->get();
     
         // Retrieve courses related to the program
@@ -424,14 +443,14 @@ class BookController extends Controller
             $query->where('assigned_program', $programId);
         })->get();
     
-        return view('faculty.archivedBooks', compact('books', 'courses'));
+        return view('faculty.ignoredBooks', compact('books', 'courses'));
     }
     
     
     
 
     
-    public function RefuseHideRequest($id)
+    public function undoIgnoredBook($id)
     {
         // Get the currently authenticated user
         $user = Auth::user();
@@ -446,17 +465,17 @@ class BookController extends Controller
         }
     
         // Decode the JSON string in the 'program_hide_request' column
-        $programHideRequest = json_decode($book->program_hide_request, true);
+        $programIgnoredBooks = json_decode($book->program_hidden, true);
     
         // Check if the program ID exists in the JSON array
-        if (is_array($programHideRequest) && in_array($programId, $programHideRequest)) {
+        if (is_array($programIgnoredBooks) && in_array($programId, $programIgnoredBooks)) {
             // Remove the program ID from the JSON array
-            $programHideRequest = array_diff($programHideRequest, [$programId]);
+            $programIgnoredBooks = array_diff($programIgnoredBooks, [$programId]);
     
-            // Update the 'program_hide_request' column with the modified JSON array
-            Book::where('id', $id)->update(['program_hide_request' => json_encode(array_values($programHideRequest))]);
+            // Update the 'program_hidden' column with the modified JSON array
+            Book::where('id', $id)->update(['program_hidden' => json_encode(array_values($programIgnoredBooks))]);
     
-            return redirect()->back()->with('success', 'The Book is now visible');
+            return redirect()->back()->with('success', 'The Book is now visible in Book Evaulation');
         }
     
         return redirect()->back()->with('error', 'Unable to unhide the book');
@@ -468,13 +487,18 @@ class BookController extends Controller
     {
         $programId = $param;
 
-        $books = Book::where(function ($query) use ($programId) {
+        $books = Book::orderBy('title', 'asc')
+        ->where(function ($query) use ($programId) {
             $query->whereNull('program_hidden')
                 ->orWhereJsonDoesntContain('program_hidden', $programId);
         })
         ->where(function ($query) use ($programId) {
             $query->whereNull('availabilty_program')
                 ->orWhereJsonDoesntContain('availabilty_program', $programId);
+        })
+        ->where(function ($query) use ($programId) {
+            $query->whereNull('program_hidden')
+                ->orWhereJsonDoesntContain('program_hidden', $programId);
         })
         ->where(function ($query) use ($programId) {
             $query->whereNull('program_hide_request')
@@ -653,7 +677,7 @@ class BookController extends Controller
         })->get();
     
         // Return the view 'others.allUsers.approvedBooks' with the data 'requestedBooks', 'user', and 'courses'
-        return view('others.allUsers.approvedBooks', compact('requestedBooks', 'courses', 'organizeBook', 'programName'));
+        return view('others.allUsers.approvedBooksLib', compact('requestedBooks', 'courses', 'organizeBook', 'programName'));
     }
     public function exportBooks(Request $request)
     {   
@@ -692,16 +716,6 @@ class BookController extends Controller
     }
 
 
-    public function cancelBook($id)
-    {
-        $status = RequestedBooks::find($id);
-
-        $status->status='Available';
-
-        $status->save();
-    
-        return redirect()->back();
-    }
     public function libRefuseBookRequest(RequestedBooks $requestedBook)
     {
 
@@ -939,39 +953,7 @@ class BookController extends Controller
 
     //     $user->notify(new BookApprovalNotification($bookTracking));
 
-        public function report()
-        {
-            $currentDate = Carbon::now();
-            $nextYear = $currentDate->copy()->addYear();
-            $fiveYearsAgo = $currentDate->copy()->subYears(5);
-            $fourYearsAgo = $currentDate->copy()->subYears(4);
-            $threeYearsAgo = $currentDate->copy()->subYears(3);
-            $twoYearsAgo = $currentDate->copy()->subYears(2);
-            $oneYearsAgo = $currentDate->copy()->subYears(1);
-            $fiveYearsBelow = range(1990, $currentDate->copy()->subYears(5)->year);
-            
-
-            $ProgramCode = 'BSIT';
-            $books = RequestedBooks::where('program_name', $ProgramCode)
-            ->where('status', 'Approved')
-            ->join('books', 'requested_books.book_id', '=', 'books.id')
-            ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles, books.year as book_year')
-            ->groupBy('requested_books.course_id', 'books.year')
-            ->orderBy('requested_books.course_id', 'asc')
-            ->with('course')
-            ->get();
-            
-            $groupedBooks = $books
-            ->groupBy('course_id');
-
-            $courseGroupsssBooksTitle = $books
-            ->groupBy('course.course_group');
-    
-            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
-
-            return view('admin.CollectionProfile.collection', compact('books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
-        }
-        public function librarianReport(Request $request)
+        public function report(Request $request)
         {   
             $param = $request->input('param');
             $currentDate = Carbon::now();
@@ -1002,11 +984,53 @@ class BookController extends Controller
             ->groupBy('course_id');
             // $groupedBooks = $books
             // ->join('books', 'requested_books.book_id', '=', 'books.title');
+            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
 
             $courseGroupsssBooksTitle = $books
+            ->whereIn('book_year', $years)
             ->groupBy('course.course_group');
     
+
+            
+            return view('admin.CollectionProfile.collection', compact('minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'param', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
+        }
+        public function librarianReport(Request $request)
+        {   
+            $param = $request->input('param');
+            $currentDate = Carbon::now();
+            $nextYear = $currentDate->copy()->addYear();
+            $fiveYearsAgo = $currentDate->copy()->subYears(5);
+            $fourYearsAgo = $currentDate->copy()->subYears(4);
+            $threeYearsAgo = $currentDate->copy()->subYears(3);
+            $twoYearsAgo = $currentDate->copy()->subYears(2);
+            $oneYearsAgo = $currentDate->copy()->subYears(1);
+            $fiveYearsBelow = range(1985, $currentDate->copy()->subYears(5)->year);
+
+            $ProgramCode = $param;
+            $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
+            ->select('requested_books.*', 'programs.minimum_req')
+            ->pluck('minimum_req')->first();
+            
+            $books = RequestedBooks::where('program_name', $ProgramCode)
+            ->where('status', 'Approved')
+            ->join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles, books.year as book_year')
+            ->groupBy('requested_books.course_id', 'books.year')
+            ->orderBy('requested_books.course_id', 'asc')
+            ->with('course')
+            ->get();
+
+            $groupedBooks = $books
+            ->groupBy('course_id');
+
+            // $courseGroupsssBooksTitle = $books
+            // ->groupBy('course.course_group');
+    
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
+
+                $courseGroupsssBooksTitle = $books
+                ->whereIn('book_year', $years)
+                ->groupBy('course.course_group');
             
             return view('admin.CollectionProfile.collection', compact('minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'param', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
         }
@@ -1023,6 +1047,7 @@ class BookController extends Controller
             $threeYearsAgo = $currentDate->copy()->subYears(3);
             $twoYearsAgo = $currentDate->copy()->subYears(2);
             $oneYearsAgo = $currentDate->copy()->subYears(1);
+            $fiveYearsBelow = range(1985, $currentDate->copy()->subYears(5)->year);
             
             $ProgramCode = Auth::user()->assigned_program;
             $books = RequestedBooks::where('program_name', $ProgramCode)
@@ -1033,21 +1058,19 @@ class BookController extends Controller
             ->orderBy('requested_books.course_id', 'asc')
             ->with('course')
             ->get();
-            
+
             $groupedBooks = $books
             ->groupBy('course_id');
-
-            $courseGroupsssBooksTitle = $books
-            ->groupBy('course.course_group');
 
             $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
             ->select('requested_books.*', 'programs.minimum_req')
             ->pluck('minimum_req')->first();
-            
-    
-            $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
     
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
+
+            $courseGroupsssBooksTitle = $books
+            ->whereIn('book_year', $years)
+            ->groupBy('course.course_group');
     
             return view('programChair.reports', compact('minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
         }
@@ -1065,6 +1088,7 @@ class BookController extends Controller
             $threeYearsAgo = $currentDate->copy()->subYears(3);
             $twoYearsAgo = $currentDate->copy()->subYears(2);
             $oneYearsAgo = $currentDate->copy()->subYears(1);
+            $fiveYearsBelow = range(1985, $currentDate->copy()->subYears(5)->year);
             
         
             // $books = RequestedBooks::selectRaw('year, course_id, SUM(volume) as total_volumes, COUNT(id) as total_titles')
@@ -1087,7 +1111,6 @@ class BookController extends Controller
             ->groupBy('course_id');
             
     
-            $fiveYearsBelow = [$fiveYearsAgo->year, $sixYearsAgo->year, $sevenYearsAgo->year, $eightYearsAgo->year, $nineYearsAgo->year];
     
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
     
@@ -1134,11 +1157,12 @@ class BookController extends Controller
             ->selectRaw('SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles')
             ->first();
 
-            $courseGroupsssBooksTitle = $books
-            ->groupBy('course.course_group');
+
             
             $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
-
+            $courseGroupsssBooksTitle = $books
+            ->whereIn('book_year', $years)
+            ->groupBy('course.course_group');
             // Load the PDF view and generate the PDF
             $pdf = PDF::loadView('pdfs', compact( 'total','minimumreq', 'books', 'groupedBooks','courseGroupsssBooksTitle', 'pageSize', 'orientation','nextYear', 'years', 'fiveYearsAgo', 'fiveYearsBelow', 'ProgramCode'))->setPaper($pageSize, $orientation);
         
@@ -1163,6 +1187,286 @@ class BookController extends Controller
             // Return a response or redirect as needed
             return redirect()->back()->with('success', 'Book has been evaluation process again');
         }
-}
 
-        
+        public function bookListTemplate(){
+            
+            {
+                try {
+                    $myTemplate = storage_path('app/public/template/BookFormat.xlsx');
+            
+                    // Set headers for Excel download
+                    $headers = [
+                        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'Content-Disposition' => 'attachment; filename="BookFormat.xlsx"',
+                    ];
+            
+                    return response()->download($myTemplate, 'BookFormat.xlsx', $headers);
+            
+                } catch (\Throwable $th) {
+                    // Handle exceptions as needed
+                    throw $th;
+                }
+            }
+
+
+        }
+            public function ignoreRequest($id){
+                {   
+                    $user = Auth::user();
+                    $programId = $user->assigned_program;
+                    $book = Book::find($id);
+                    // Retrieve the current value of program_hide_request
+                    $currentPrograms = json_decode($book->program_hide_request) ?? [];
+                
+                    // Check if the program is not already present in the programs array
+                    if (!in_array($programId, $currentPrograms)) {
+                        $currentPrograms[] = $programId;
+                
+                        // Update the book's program_hide_request attribute
+                        $book->program_hide_request = json_encode($currentPrograms);
+                        $book->save();
+                    }
+
+                    return redirect()->back()->with('success', 'Your request to ignore the book has been sent to the Program Chair.');
+            }
+            
+            
+        }
+        public function libIgnoreRequest(Request $request, $id){
+            {   
+                $programId = $request->input('param');
+                $book = Book::find($id);
+                // Retrieve the current value of program_hide_request
+                $currentPrograms = json_decode($book->program_hide_request) ?? [];
+            
+                // Check if the program is not already present in the programs array
+                if (!in_array($programId, $currentPrograms)) {
+                    $currentPrograms[] = $programId;
+            
+                    // Update the book's program_hide_request attribute
+                    $book->program_hide_request = json_encode($currentPrograms);
+                    $book->save();
+                }
+
+                return redirect()->back()->with('success', 'Your request to ignore the book has been sent to the Program Chair.');
+        }
+    }
+
+            public function ignoredRequest(){
+                $user = Auth::user();
+                $programId = $user->assigned_program;
+            
+                // Retrieve books where 'program_hide_request' contains the programId
+                // and 'program_hidden' does not contain the programId
+                $books = Book::whereJsonContains('program_hide_request', $programId)
+                ->where(function ($query) use ($programId) {
+                    $query->whereJsonDoesntContain('program_hidden', $programId)
+                          ->orWhereNull('program_hidden');
+                })
+                ->get();
+            
+                // Retrieve courses related to the program
+                $courses = Course::whereHas('program', function ($query) use ($programId) {
+                    $query->where('assigned_program', $programId);
+                })->get();
+            
+                return view('faculty.ignoreRequestBook', compact('books', 'courses'));
+            }
+            public function PCignoredRequest(){
+                $user = Auth::user();
+                $programId = $user->assigned_program;
+            
+                // Retrieve books where 'program_hide_request' contains the programId
+                // and 'program_hidden' does not contain the programId
+                $books = Book::whereJsonContains('program_hide_request', $programId)
+                ->where(function ($query) use ($programId) {
+                    $query->whereJsonDoesntContain('program_hidden', $programId)
+                          ->orWhereNull('program_hidden');
+                })
+                ->get();
+            
+                // Retrieve courses related to the program
+                $courses = Course::whereHas('program', function ($query) use ($programId) {
+                    $query->where('assigned_program', $programId);
+                })->get();
+            
+                return view('programChair.ignoreRequestBook', compact('books', 'courses'));
+            }
+            public function undoIgnoreRequestBook($id)
+            {
+                // Get the currently authenticated user
+                $user = Auth::user();
+                $programId = $user->assigned_program;
+            
+                // Find the book by its ID
+                $book = Book::find($id);
+            
+                // Check if the book exists
+                if (!$book) {
+                    return redirect()->back()->with('error', 'Book not found');
+                }
+            
+                // Decode the JSON string in the 'program_hide_request' column
+                $programIgnoredBooks = json_decode($book->program_hide_request, true);
+            
+                // Check if the program ID exists in the JSON array
+                if (is_array($programIgnoredBooks) && in_array($programId, $programIgnoredBooks)) {
+                    // Remove the program ID from the JSON array
+                    $programIgnoredBooks = array_diff($programIgnoredBooks, [$programId]);
+            
+                    // Update the 'program_hide_request' column with the modified JSON array
+                    Book::where('id', $id)->update(['program_hide_request' => json_encode(array_values($programIgnoredBooks))]);
+            
+                    return redirect()->back()->with('success', 'The Book is now visible again');
+                }
+            
+                return redirect()->back()->with('error', 'Unable to unhide the book');
+            }
+            public function confirmIgnoreRequestBook($id)
+            {
+                // Get the currently authenticated user
+                $user = Auth::user();
+                $programId = $user->assigned_program;
+            
+                // Find the book by its ID
+                $book = Book::find($id);
+            
+                // Check if the book exists
+                if (!$book) {
+                    return redirect()->back()->with('error', 'Book not found');
+                }
+            
+                $programIgnoredBooks = json_decode($book->program_hide_request, true);
+                $otherField = json_decode($book->program_hidden, true);
+                
+                // Check if the program ID exists in the JSON array
+                if (is_array($programIgnoredBooks) && in_array($programId, $programIgnoredBooks)) {
+                    // Remove the program ID from both JSON arrays
+                    $programIgnoredBooks = array_diff($programIgnoredBooks, [$programId]);
+                    $otherField = array_diff($otherField, [$programId]);
+                
+                    // Update both columns with the modified JSON arrays
+                    Book::where('id', $id)->update([
+                        'program_hide_request' => json_encode(array_values($programIgnoredBooks)),
+                        'program_hidden' => json_encode(array_values($otherField))
+                    ]);
+                
+                    return redirect()->back()->with('success', 'The Book is now visible again');
+                }
+                
+            
+                return redirect()->back()->with('error', 'Unable to unhide the book');
+            }
+            public function PCrefuseIgnoreRequestBook($id)
+            {
+                // Get the currently authenticated user
+                $user = Auth::user();
+                $programId = $user->assigned_program;
+            
+                // Find the book by its ID
+                $book = Book::find($id);
+            
+                // Check if the book exists
+                if (!$book) {
+                    return redirect()->back()->with('error', 'Book not found');
+                }
+            
+                // Decode the JSON string in the 'program_hide_request' column
+                $programIgnoredBooks = json_decode($book->program_hide_request, true);
+            
+                // Check if the program ID exists in the JSON array
+                if (is_array($programIgnoredBooks) && in_array($programId, $programIgnoredBooks)) {
+                    // Remove the program ID from the JSON array
+                    $programIgnoredBooks = array_diff($programIgnoredBooks, [$programId]);
+            
+                    // Update the 'program_hide_request' column with the modified JSON array
+                    Book::where('id', $id)->update(['program_hide_request' => json_encode(array_values($programIgnoredBooks))]);
+            
+                    return redirect()->back()->with('success', 'The Book is now visible again');
+                }
+            
+                return redirect()->back()->with('error', 'Unable to unhide the book');
+            }
+            public function sampleReport(Request $request)
+        {   
+            $param = 'BSIT';
+            $currentDate = Carbon::now();
+            $nextYear = $currentDate->copy()->addYear();
+            $fiveYearsAgo = $currentDate->copy()->subYears(5);
+            $fourYearsAgo = $currentDate->copy()->subYears(4);
+            $threeYearsAgo = $currentDate->copy()->subYears(3);
+            $twoYearsAgo = $currentDate->copy()->subYears(2);
+            $oneYearsAgo = $currentDate->copy()->subYears(1);
+            $fiveYearsBelow = range(1985, $currentDate->copy()->subYears(5)->year);
+            
+
+            $ProgramCode = $param;
+            $minimumreq = RequestedBooks::join('programs', 'requested_books.program_name', '=', 'programs.name')
+            ->select('requested_books.*', 'programs.minimum_req')
+            ->pluck('minimum_req')->first();
+            
+            $books = RequestedBooks::where('program_name', $ProgramCode)
+            ->where('status', 'Approved')
+            ->join('books', 'requested_books.book_id', '=', 'books.id')
+            ->selectRaw('requested_books.course_id, SUM(books.volume) as total_volumes, COUNT(requested_books.id) as total_titles, books.year as book_year')
+            ->groupBy('requested_books.course_id', 'books.year')
+            ->orderBy('requested_books.course_id', 'asc')
+            ->with('course')
+            ->get();
+
+            $groupedBooks = $books
+            ->groupBy('course_id');
+            // $groupedBooks = $books
+            // ->join('books', 'requested_books.book_id', '=', 'books.title');
+            $years = [$fourYearsAgo->year, $threeYearsAgo->year, $twoYearsAgo->year, $oneYearsAgo->year, $currentDate->year, $nextYear->year];
+
+            $courseGroupsssBooksTitle = $books
+            ->whereIn('book_year', $years)
+            ->groupBy('course.course_group');
+            $additionalPercentage = 0;
+            $TotalresultPercentage = 0;
+            $grandTotalresultPercentage = 0;
+            $totalAdditionalPercentage = 0;
+            $rowCount = 0;
+            foreach ($groupedBooks as $courseId => $courseGroup){
+                $grandTotalTitles = 0;
+                $grandTotalVolumes = 0;
+                $rowCount++;
+                foreach (array_reverse($years) as $year){
+                        $totalTitles = 0;
+                        $totalVolumes = 0;
+                        $lastYearToRemoveData = reset($years);
+                    foreach ($courseGroup as $book){
+                        if ($book->book_year == $year){
+                                $totalTitles += $book->total_titles;
+                                $totalVolumes += $book->total_volumes;
+                        }
+                    }   
+                        $grandTotalTitles += $totalTitles;
+                        $grandTotalVolumes += $totalVolumes;
+                        $result = ($grandTotalTitles >= $minimumreq) ? 100 : ($grandTotalTitles * 20);
+
+                        $excessTitles = ($grandTotalTitles >= $minimumreq) ? ($grandTotalTitles - $minimumreq) : 0;
+
+                        if ($excessTitles > 0) {
+                            // Calculate the excessTitles percentage
+                            $percentage = ($excessTitles <= $minimumreq) ? ($excessTitles * 20) : 100;
+                        } else {
+                            $percentage = 0;
+                        }
+                
+                }
+                $additionalPercentage += $percentage;
+                $TotalresultPercentage += $result;
+                $grandTotalresultPercentage = $TotalresultPercentage / $rowCount;
+                $totalAdditionalPercentage = $additionalPercentage / $rowCount;
+
+                }
+
+                $compiledPercentage = $grandTotalresultPercentage + $totalAdditionalPercentage;
+
+            
+            return view('admin.CollectionProfile.sample', compact('compiledPercentage', 'minimumreq', 'books', 'groupedBooks', 'courseGroupsssBooksTitle', 'years', 'param', 'fiveYearsAgo', 'nextYear', 'fiveYearsBelow', 'ProgramCode'));
+        }
+    }
+    

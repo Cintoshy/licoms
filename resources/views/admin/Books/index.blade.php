@@ -36,6 +36,9 @@
                                 <span class="text">Import Books
                                 </span>
                             </button>
+                            <a class="btn btn-outline-info mb-3"  href="{{ (route('download.bookListTemplate')) }}">    
+                                <i class="fa fa-download mr-2"></i>Template
+                            </a>   
                             <!-- <button class="btn btn-primary" data-toggle="modal" data-target="#MinimumRequirements">
                                 <span class="text">Import Existing Approved Books
                                 </span>
@@ -77,7 +80,6 @@
                 <table class="table table-bordered table-striped" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Book ID</th>
                             <th>Call Number</th>
                             <th>Title</th>
                             <th>Author</th>
@@ -92,7 +94,6 @@
                     <tbody>
                         @foreach($dateFilterResults as $book)
                             <tr>
-                                <td>{{ $book->id }}</td>
                                 <td>{{ $book->call_number }}</td>
                                 <td>{{ $book->title }}</td>
                                 <td>{{ $book->author }}</td>

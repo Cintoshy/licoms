@@ -24,7 +24,6 @@
                 <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Employee ID</th>
                             <th>First Name</th>
                             <th>Last Name</th>
@@ -39,7 +38,6 @@
                     <tbody>
                         @foreach($employees as $employee)
                             <tr>
-                                <td>{{ $employee->id }}</td>
                                 <td>{{ $employee->user_id }}</td>
                                 <td>{{ $employee->first_name }}</td>
                                 <td>{{ $employee->last_name }}</td>

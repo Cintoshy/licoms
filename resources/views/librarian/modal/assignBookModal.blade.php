@@ -1,4 +1,4 @@
-    <div class="modal fade" id="confirmationModal{{$book->id}}" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmationModal{{$book->id}}" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -8,7 +8,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to select this <strong>"{{$book->title}}"</strong> title for this course subject?
+                    Are you sure you want to assign this <strong>"{{$book->title}}"</strong> title for this course subject?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

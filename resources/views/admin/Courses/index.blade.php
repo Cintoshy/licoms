@@ -57,7 +57,6 @@
                 <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Course Code</th>
                             <th>Course Name</th>
                             <th>Course Group</th>
@@ -69,7 +68,6 @@
                     <tbody>
                         @foreach($dateFilterResults as $course)
                             <tr>
-                                <td>{{ $course->id }}</td>
                                 <td>{{ $course->course_code }}</td>
                                 <td>{{ $course->course_title }}</td>
                                 <td>{{ $course->course_group }}</td>

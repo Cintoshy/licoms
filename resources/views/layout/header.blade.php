@@ -174,12 +174,22 @@
                 <i class="fas fa-regular fa-hourglass-half"></i>
                     <span>Pending Books</span></a>
             </li>
+            <li class="nav-item @if(Route::is('pg.PCignoredRequest')) active @endif">
+                <a class="nav-link" href="{{ route('pg.PCignoredRequest') }}">
+                <i class="fas fa-regular fa-hourglass-half"></i>
+                    <span>Ignore Book Requests</span></a>
+            </li>
 
-            <li class="nav-item @if(Route::is('pg.hideRequest')) active @endif">
+            <!-- <li class="nav-item @if(Route::is('pg.hideRequest')) active @endif">
                 <a class="nav-link" href="{{ route('pg.hideRequest') }}">
                     <i class="fas fa-fw fa-eye-slash"></i>
                     <span>Hide Requests</span></a>
             </li>
+            <li class="nav-item @if(Route::is('pg.hideRequest')) active @endif">
+                <a class="nav-link" href="{{ route('pg.hideRequest') }}">
+                    <i class="fas fa-fw fa-eye-slash"></i>
+                    <span>Ignored Books</span></a>
+            </li> -->
             </div>
         <!-- Program Chair End of Sidebar -->
 
@@ -247,6 +257,12 @@
                     <span>Pending Books</span></a>
             </li>
 
+            <li class="nav-item @if(Route::is('lib.pendingBooks')) active @endif">
+                <a class="nav-link" type="button" data-toggle="modal" data-target="#listProgramIgnoredBookModal">
+                    <i class="fas fa-regular fa-book"></i>
+                    <span>Ignored Books</span></a>
+            </li>
+
         </div>
         @include('librarian.modal.listProgramsModal')
         <!-- Librarian End of Sidebar -->
@@ -299,10 +315,10 @@
                 <i class="fas fa-regular fa-hourglass-half"></i>
                     <span>Pending</span></a>
             </li>
-            <li class="nav-item @if(Route::is('fac.archivedBooks')) active @endif">
-                <a class="nav-link" href="{{ route('fac.archivedBooks') }}">
+            <li class="nav-item @if(Route::is('fac.ignoredBooks')) active @endif">
+                <a class="nav-link" href="{{ route('fac.ignoredBooks') }}">
                 <i class="fas fa-sm fa-regular fa-eye-slash"></i>
-                    <span>Archived Books</span></a>
+                    <span>Ignored Books</span></a>
             </li>
             </div>
 
@@ -475,18 +491,33 @@
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Activity
                                         </a>
+                                        <a class="dropdown-item" 
+                                        href="{{ route('pg.ignoredBooks') }}">
+                                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Ignored Books
+                                    </a>
                                     @elseif ($user_role->role === 2)
                                     <a class="dropdown-item" 
                                         href="{{ route('activityLogs') }}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Activity    
                                         </a>
+                                        <a class="dropdown-item" 
+                                        href="{{ route('activityLogs') }}">
+                                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Ignored Books
+                                    </a>
 
                                         @elseif ($user_role->role === 3)
                                     <a class="dropdown-item" 
                                         href="{{ route('activityLogs') }}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Activity
+                                    </a>
+                                    <a class="dropdown-item" 
+                                        href="{{ route('fac.ignoredRequest') }}">
+                                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Ignore Request
                                     </a>
                                     @endif 
 

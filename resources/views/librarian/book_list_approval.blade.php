@@ -34,7 +34,7 @@
         <div class="card-header">
             <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
-                <h1 class="display-6 fw-bolder text-uppercase">Book Evaluation -  <span class="text-danger">({{$programId}}) </span></h1>
+                <h1 class="display-6 fw-bolder text-uppercase">Book List -  <span class="text-danger">({{$programId}}) </span></h1>
                 </div>
                 <div class="col-auto">
                     <i class="fas fa-book fa-4x text-gray-500 pr-3"></i>
@@ -50,49 +50,55 @@
                             <th>Author</th>
                             <th>Volume</th>
                             <th>Year</th>
-                            <th width="10%">CC</th>
-                            <th>Action</th>
+                            <th width="25%">Course Code</th>
+                            <th width="10%">Action</th>
                             <th>Deadline</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($books as $book)
                             <tr>
-                                <td class="fw-bold text-uppercase">{{ $book->title }}</td>
+                                <td class="fw-bold text-uppercase">
+                                <a href="{{ route('lib-books.show', $book->id) }}" class="text-dark">
+                                        {{ $book->title }}
+                                    </a>
+                                    
+                                </td>
                                 <td>{{ $book->author }}</td>
                                 <td>{{ $book->volume }}</td>
                                 <td>{{ $book->year }}</td>
                                 <td class="align-middle">
-                                <form action="{{ route('lib-approve.book', ['id' => $book->id, 'param' => 'BSIT']) }}" method="post">
-                                @csrf
-                                <select class="selectpicker" id="selectpickerrr" data-live-search="true" id="dropdown-options" name="course_code" required>
-                                    <option></option>
-                                    @foreach ($courses as $course)
-                                        <option value="{{ $course->course_code }}">{{ $course->course_code }} - {{ $course->course_title }}</option>
-                                    @endforeach
-                                </select>
+                                <form action="{{ route('lib-approve.book', ['id' => $book->id, 'param' => $programId]) }}" method="post">
+                                    @csrf
+                                    <div class="input-group">
+                                        <select class="selectpicker form-control" id="selectpickerrr" data-live-search="true" id="dropdown-options" name="course_code" required>
+                                            <option></option>
+                                            @foreach ($courses as $course)
+                                                <option value="{{ $course->course_code }}">{{ $course->course_code }} - {{ $course->course_title }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#confirmationModal{{$book->id}}">
+                                            <span class="icon text-light">
+                                                Assign
+                                                <i class="fa-solid fa-check ms-1"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    @include('librarian.modal.assignBookModal')
+                                </form>
                                 </td>
-                                <td>
-                                <a href="{{ route('fac-books.show', $book->id) }}" class="btn btn-primary btn-sm w-100">
-                                        <span class="icon text-light">
-                                            View
-                                            <i class="fa-solid fa-eye ms-1"></i>
-                                        </span>
-                                    </a>
-                                <button type="submit" class="btn btn-success btn-sm w-100 mt-1">
-                                        <span class="icon text-light">
-                                             Note
-                                            <i class="fa-solid fa-check ms-1"></i>
-                                        </span>
-                                    </button>
-                                 </form>
-
-
-
-                                </td>
+                                <td class="align-middle">
+                                    <button class="btn btn-secondary w-100" type="button" data-toggle="modal" data-target="#ignoreBookModal{{$book->id}}">
+                                            <span class="icon text-light">
+                                            Ignore
+                                                <i class="fa-solid fa-eye-slash ms-1"></i>
+                                            </span>
+                                        </button>
+                                @include('librarian.modal.ignoreRequestBook')
+                            </td>
                                 <td>
                                     @php
-                                        $dueDate = $book->created_at->addWeeks(2);
+                                        $dueDate = $book->created_at->addDays(10);
                                         $now = now();
                                         $remainingDays = $dueDate->diffInDays($now);
                                     @endphp

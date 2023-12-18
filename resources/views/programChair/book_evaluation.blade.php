@@ -20,8 +20,8 @@
                     <thead>
                         <tr>
                             <th>Book Title</th>
-                            <th>CC</th>
-                            <th>Course Subject</th>
+                            <th>Course Code</th>
+                            <th>Course</th>
                             <th>Faculty</th>
                             <th>Status</th>
                             <th width="8%">Action</th>
@@ -55,6 +55,13 @@
                                         </span>
                                     </button>
                                     <div class="dropdown-divider"></div>
+                                    <button class="dropdown-item" type="button" data-toggle="modal" data-target="#editCC{{$requestedBook->id}}">
+                                        <span class="text fw-bold">
+                                            Edit
+                                            <i class="fa-solid fa-pencil ms-1"></i>
+                                        </span> 
+                                    </button>
+                                    <div class="dropdown-divider"></div>
                                     <button class="dropdown-item" type="button" data-toggle="modal" data-target="#refuseBookRequestModal{{$requestedBook->id}}">
                                         <span class="text fw-bold">
                                             Refuse
@@ -62,7 +69,8 @@
                                         </span> 
                                     </button>
                                     <div class="dropdown-divider"></div>
-                            </div>
+                            </div>  
+                            @include('programChair.modal.editModal')
                                     @include('programChair.modal.verifyBookRequestModal')
                                     @include('programChair.modal.refuseBookRequest')
                                 </td>

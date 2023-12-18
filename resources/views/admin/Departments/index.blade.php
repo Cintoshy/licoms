@@ -24,7 +24,6 @@
                 <table class="table table-bordered" id="tableData" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Department Name</th>
                             <th>Description</th>
                             <th>Logo</th>
@@ -34,7 +33,6 @@
                     <tbody>
                         @foreach($department as $department)
                             <tr>
-                            <td>{{ $department->id }}</td>
                                 <td>{{ $department->department_name }}</td>
                                 <td>{{ $department->description }}</td>
                                 <td>

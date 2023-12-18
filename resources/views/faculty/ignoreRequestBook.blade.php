@@ -7,7 +7,7 @@
     <div class="card-header">
             <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
-                <h1 class="display-6 fw-bolder text-uppercase">Archived Books</h1>
+                <h1 class="display-6 fw-bolder text-uppercase">Ignore Book Requests</h1>
                 </div>
                 <div class="col-auto">
                     <i class="fas fa-book fa-4x text-gray-500 pr-3"></i>
@@ -30,17 +30,21 @@
                         @foreach($books as $book)
                             <tr >
                                 <td class="fw-bold">{{ $book->call_number }}</td>
-                                <td class="fw-bold">{{ $book->title }}</td>
+                                <td class="fw-bold ">
+                                <a href="{{ route('fac-books.show', $book->id) }}" class="text-dark">
+                                        {{ $book->title }}
+                                    </a>
+                                </td>
                                 <td>{{ $book->author }}</td>
                                 <td>{{ $book->publish }}</td>
-                                <td width="15%">
-                                <button type="button" class="btn btn-danger btn-sm mt-1" data-toggle="modal" data-target="#hideBookRequestModal{{$book->id}}">
+                                <td>
+                                <button type="button" class="btn btn-secondary btn-sm mt-1 w-100" data-toggle="modal" data-target="#undoIgnoredBook{{$book->id}}">
                                         <span class="icon text-light">
-                                            Cancel Hide Request
-                                            <i class="fa-solid fa-ban ms-1"></i>
+                                            Revoke
+                                            <i class="fa-solid fa-rotate-left ms-1"></i>
                                         </span>      
                                 </button>
-                                @include('faculty.modal.cancelHideBookrequest')
+                                @include('faculty.modal.undoIgnoreRequestBook')
                                 </td>
                             </tr>
                         @endforeach
