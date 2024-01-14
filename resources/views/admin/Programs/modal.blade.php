@@ -61,7 +61,7 @@
 
                             <div class="col-sm-12 sm-0">
                                 <input type="number" class="form-control form-control-user" id="minimum_req" name="minimum_req" value=""
-                                    placeholder="Minimum Req" min="1" max="10" required>
+                                    placeholder="Minimum Req" min="1" max="10" pattern="[1-9]{2}" oninput="validateInput(this)" required>
                             </div>
 
 
@@ -74,3 +74,11 @@
                 <div class="modal-footer">
                     <h6 class="text-primary">LICOMS</h6>
                 </div>
+                <script>
+                function validateInput(input) {
+                    input.value = input.value.replace(/e/gi, '');
+
+                    input.value = input.value.replace(/[^\d]/g, '').substring(0, 2);
+                    
+                }
+            </script>
